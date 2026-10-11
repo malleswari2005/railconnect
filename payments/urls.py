@@ -1,7 +1,9 @@
 from django.urls import path
+from . import views
 
 app_name = 'payments'
 
 urlpatterns = [
-    # Will be populated in Phase 5
+    path('gateway/<str:pnr>/', views.demo_gateway_view, name='gateway'),
+    path('retry/<str:pnr>/', views.retry_payment_view, name='retry'),
 ]

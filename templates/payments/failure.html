@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Failed – PNR {{ booking.pnr }} | RailConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <div class="rc-card p-4 p-md-5">
+        <div class="display-3 text-danger mb-3">⚠️</div>
+        <h2 class="h3 fw-bold text-dark mb-2">Simulated Payment Decline</h2>
+        <p class="text-secondary mb-4">
+          The payment simulation was not completed. No amount was debited, and seats have been safely restored.
+        </p>
+
+        <div class="card bg-light p-3 border mb-4 text-start font-monospace small">
+          <div><strong>PNR Reference:</strong> {{ booking.pnr }}</div>
+          <div><strong>Transaction ID:</strong> {{ payment.transaction_id }}</div>
+          <div><strong>Attempted Amount:</strong> ₹{{ payment.amount }}</div>
+          <div><strong>Reason:</strong> {{ payment.failure_reason }}</div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3">
+          <a href="{% url 'payments:retry' booking.pnr %}" class="btn btn-rc-orange px-4 py-2 fw-bold">
+            🔄 Retry Payment Simulation
+          </a>
+          <a href="{% url 'core:home' %}" class="btn btn-outline-secondary px-4">
+            Cancel & Home
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
