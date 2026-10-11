@@ -127,3 +127,46 @@ class DashboardAndCancellationTestCase(TestCase):
         response = self.client.get(reverse('dashboard:staff_bookings'))
         self.assertEqual(response.status_code, 200)
 
+    def test_cancellation_refund_tiers(self):
+        """Test partial refund tier (12-48h: 50%) and non-refundable tier (<12h: 0%)."""
+        # Tier 2: 24 hours in future (12-48h) -> 50% refund
+        journey_24h = date.today() + timedelta(days=1)
+        b_24h = Booking.objects.create(
+            pnr='4444444444',
+            user=self.user,
+            train=self.train,
+            from_station=self.st1,
+            to_station=self.st2,
+            journey_date=journey_24h,
+            class_code='CC',
+            status='CONFIRMED',
+            total_fare=Decimal('1000.00')
+        )
+        Passenger.objects.create(booking=b_24h, name='Tier2 Passenger', age=28, gender='M', fare=Decimal('1000.00'))
+        
+        # Test cancel function directly
+        c2 = cancel_booking_or_passengers(b_24h, reason='Tier 2 Test')
+        self.assertIsNotNone(c2)
+        # 1 day is between 12 and 48 hours -> 50% refund
+        self.assertEqual(c2.refund_amount, Decimal('500.00'))
+        self.assertEqual(c2.cancellation_fee, Decimal('500.00'))
+
+        # Tier 3: today (0 hours / <12h) -> 0% refund
+        b_0h = Booking.objects.create(
+            pnr='5555555555',
+            user=self.user,
+            train=self.train,
+            from_station=self.st1,
+            to_station=self.st2,
+            journey_date=date.today(),
+            class_code='CC',
+            status='CONFIRMED',
+            total_fare=Decimal('1000.00')
+        )
+        Passenger.objects.create(booking=b_0h, name='Tier3 Passenger', age=32, gender='F', fare=Decimal('1000.00'))
+        c3 = cancel_booking_or_passengers(b_0h, reason='Tier 3 Test')
+        self.assertIsNotNone(c3)
+        self.assertEqual(c3.refund_amount, Decimal('0.00'))
+        self.assertEqual(c3.cancellation_fee, Decimal('1000.00'))
+
+
