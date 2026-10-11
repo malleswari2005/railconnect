@@ -107,3 +107,23 @@ class DashboardAndCancellationTestCase(TestCase):
         self.assertEqual(p_b.status, 'CONFIRMED')
         self.assertEqual(p_b.allocated_seat, allocated_seat)
         self.assertEqual(b_b.status, 'CONFIRMED')
+
+    def test_staff_dashboard_access_control(self):
+        """Non-staff user must be forbidden/redirected from staff dashboard."""
+        response = self.client.get(reverse('dashboard:staff_dashboard'))
+        self.assertEqual(response.status_code, 302) # Redirects to login
+
+        # Staff user must have full access
+        staff_user = User.objects.create_user(username='controller', password='Pass@123', is_staff=True)
+        self.client.login(username='controller', password='Pass@123')
+
+        response = self.client.get(reverse('dashboard:staff_dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Staff Analytics & Oversight')
+
+        response = self.client.get(reverse('dashboard:staff_trains'))
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(reverse('dashboard:staff_bookings'))
+        self.assertEqual(response.status_code, 200)
+

@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Staff Operations & Analytics Dashboard | RailConnect{% endblock %}
+
+{% block content %}
+<div class="bg-dark text-white py-4 mb-4 border-bottom border-warning border-3">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <div class="badge bg-warning text-dark fw-bold mb-1">Control Room Terminal</div>
+        <h1 class="h3 fw-bold mb-0">RailConnect Staff Analytics & Oversight</h1>
+        <div class="small text-light opacity-75 mt-1">
+          Logged in as Controller <strong>{{ user.username }}</strong> &bull; Real-time inventory and revenue telemetry
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <a href="{% url 'dashboard:staff_trains' %}" class="btn btn-outline-light btn-sm">
+          🚆 Trains Registry
+        </a>
+        <a href="{% url 'dashboard:staff_bookings' %}" class="btn btn-outline-light btn-sm">
+          📋 Bookings Master
+        </a>
+        <a href="/admin/" class="btn btn-warning btn-sm text-dark fw-bold" target="_blank">
+          ⚙️ Django Admin
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <!-- Key Performance Indicators (KPI Cards) -->
+  <div class="row g-3 mb-4">
+    <div class="col-xl-3 col-sm-6">
+      <div class="rc-card p-3 border-start border-4 border-primary">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="small text-muted text-uppercase fw-semibold d-block">Total Bookings</span>
+            <div class="fs-3 fw-bold text-dark">{{ total_bookings }}</div>
+            <span class="small text-muted">{{ total_passengers }} Passengers</span>
+          </div>
+          <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle fs-4">🎫</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="rc-card p-3 border-start border-4 border-success">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="small text-muted text-uppercase fw-semibold d-block">Net Revenue</span>
+            <div class="fs-3 fw-bold text-success">₹{{ net_revenue }}</div>
+            <span class="small text-muted">Gross: ₹{{ total_revenue }}</span>
+          </div>
+          <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle fs-4">💰</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="rc-card p-3 border-start border-4 border-danger">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="small text-muted text-uppercase fw-semibold d-block">Refunds Issued</span>
+            <div class="fs-3 fw-bold text-danger">₹{{ total_refunds }}</div>
+            <span class="small text-muted">{{ cancelled_count }} Cancelled / Adjusted</span>
+          </div>
+          <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-circle fs-4">↩️</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+      <div class="rc-card p-3 border-start border-4 border-warning">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="small text-muted text-uppercase fw-semibold d-block">Network Active</span>
+            <div class="fs-3 fw-bold text-dark">{{ active_trains }} Trains</div>
+            <span class="small text-muted">{{ total_stations }} Stations Served</span>
+          </div>
+          <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle fs-4">🚆</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart.js Offline Visualizations -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-6">
+      <div class="rc-card p-4 h-100">
+        <h5 class="h6 fw-bold text-dark mb-3 pb-2 border-bottom">Booking Status Breakdown</h5>
+        <div style="height: 260px;" class="position-relative">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="rc-card p-4 h-100">
+        <h5 class="h6 fw-bold text-dark mb-3 pb-2 border-bottom">Travel Class Preference</h5>
+        <div style="height: 260px;" class="position-relative">
+          <canvas id="classChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Recent Bookings Table -->
+    <div class="col-lg-8">
+      <div class="rc-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+          <h5 class="h6 fw-bold text-dark mb-0">Latest Booking Transactions</h5>
+          <a href="{% url 'dashboard:staff_bookings' %}" class="small fw-semibold text-decoration-none">View All &rarr;</a>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle table-sm mb-0">
+            <thead class="table-light small">
+              <tr>
+                <th>PNR</th>
+                <th>Passenger / User</th>
+                <th>Train</th>
+                <th>Status</th>
+                <th class="text-end">Fare</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in recent_bookings %}
+                <tr>
+                  <td><a href="{% url 'bookings:ticket_detail' b.pnr %}" class="font-monospace fw-bold">{{ b.pnr }}</a></td>
+                  <td>{{ b.user.username }}</td>
+                  <td>{{ b.train.train_number }} ({{ b.class_code }})</td>
+                  <td>
+                    {% if b.status == 'CONFIRMED' %}
+                      <span class="badge bg-success">CNF</span>
+                    {% elif b.status == 'WAITLISTED' %}
+                      <span class="badge bg-warning text-dark">WL</span>
+                    {% elif b.status == 'CANCELLED' %}
+                      <span class="badge bg-danger">CAN</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ b.status }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end fw-bold">₹{{ b.total_fare }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center text-muted">No bookings recorded yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Audit Feed -->
+    <div class="col-lg-4">
+      <div class="rc-card p-4">
+        <h5 class="h6 fw-bold text-dark mb-3 pb-2 border-bottom">System Audit Log Feed</h5>
+        <div class="list-group list-group-flush small">
+          {% for log in recent_logs %}
+            <div class="list-group-item px-0 py-2">
+              <div class="d-flex justify-content-between">
+                <span class="badge bg-dark">{{ log.action }}</span>
+                <span class="text-muted" style="font-size: 0.7rem;">{{ log.created_at|timesince }} ago</span>
+              </div>
+              <div class="text-secondary mt-1" style="font-size: 0.8rem;">
+                <strong>PNR {{ log.booking.pnr }}</strong>: {{ log.description }}
+              </div>
+            </div>
+          {% empty %}
+            <div class="text-muted">No audit logs recorded yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Local Offline Chart.js Bundle -->
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // 1. Status Doughnut Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Confirmed', 'Waitlisted', 'Cancelled'],
+        datasets: [{
+          data: [{{ confirmed_count }}, {{ waitlist_count }}, {{ cancelled_count }}],
+          backgroundColor: ['#198754', '#ffc107', '#dc3545'],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+
+    // 2. Class Preference Bar Chart
+    const classCtx = document.getElementById('classChart').getContext('2d');
+    const classLabels = {{ class_labels|safe }};
+    const classCounts = {{ class_counts|safe }};
+
+    new Chart(classCtx, {
+      type: 'bar',
+      data: {
+        labels: classLabels.length ? classLabels : ['1A', '2A', '3A', 'SL', 'CC'],
+        datasets: [{
+          label: 'Bookings by Class',
+          data: classCounts.length ? classCounts : [0, 0, 0, 0, 0],
+          backgroundColor: '#0b2545',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

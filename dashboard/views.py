@@ -103,3 +103,81 @@ def cancel_booking_view(request, pnr):
         'clerkage_pct': clerkage_pct,
         'tier_label': tier_label,
     })
+
+def is_staff_check(user):
+    return user.is_authenticated and user.is_staff
+
+@user_passes_test(is_staff_check, login_url='accounts:login')
+def staff_dashboard_view(request):
+    """
+    Control room staff analytics dashboard with operational KPIs,
+    local offline Chart.js visualizations, and recent audit logs.
+    """
+    total_bookings = Booking.objects.count()
+    total_passengers = Passenger.objects.count()
+    active_trains = Train.objects.filter(is_active=True).count()
+    total_stations = Station.objects.count()
+
+    # Revenue calculation
+    from django.db.models import Sum, Count
+    total_revenue = Booking.objects.filter(status__in=['CONFIRMED', 'WAITLISTED', 'PARTIALLY_CANCELLED']).aggregate(
+        rev=Sum('total_fare')
+    )['rev'] or Decimal('0.00')
+
+    total_refunds = Cancellation.objects.aggregate(ref=Sum('refund_amount'))['ref'] or Decimal('0.00')
+    net_revenue = total_revenue - total_refunds
+
+    # Status counts
+    confirmed_count = Booking.objects.filter(status='CONFIRMED').count()
+    waitlist_count = Booking.objects.filter(status='WAITLISTED').count()
+    cancelled_count = Booking.objects.filter(status__in=['CANCELLED', 'PARTIALLY_CANCELLED']).count()
+
+    # Class breakdown
+    class_stats = Booking.objects.values('class_code').annotate(count=Count('id')).order_by('-count')
+    class_labels = [c['class_code'] for c in class_stats]
+    class_counts = [c['count'] for c in class_stats]
+
+    recent_bookings = Booking.objects.select_related('user', 'train', 'from_station', 'to_station').order_by('-created_at')[:10]
+    recent_logs = BookingLog.objects.select_related('booking').order_by('-created_at')[:8]
+
+    return render(request, 'dashboard/staff_dashboard.html', {
+        'total_bookings': total_bookings,
+        'total_passengers': total_passengers,
+        'active_trains': active_trains,
+        'total_stations': total_stations,
+        'total_revenue': total_revenue,
+        'total_refunds': total_refunds,
+        'net_revenue': net_revenue,
+        'confirmed_count': confirmed_count,
+        'waitlist_count': waitlist_count,
+        'cancelled_count': cancelled_count,
+        'class_labels': class_labels,
+        'class_counts': class_counts,
+        'recent_bookings': recent_bookings,
+        'recent_logs': recent_logs,
+    })
+
+@user_passes_test(is_staff_check, login_url='accounts:login')
+def staff_trains_view(request):
+    """Staff management table for trains and coaches."""
+    trains = Train.objects.select_related('source_station', 'destination_station').prefetch_related('classes', 'stops').all()
+    return render(request, 'dashboard/staff_trains.html', {'trains': trains})
+
+@user_passes_test(is_staff_check, login_url='accounts:login')
+def staff_bookings_view(request):
+    """Staff lookup and management table for all system bookings."""
+    query = request.GET.get('q', '').strip()
+    status_filter = request.GET.get('status', '').strip()
+
+    bookings = Booking.objects.select_related('user', 'train', 'from_station', 'to_station').order_by('-created_at')
+    if query:
+        bookings = bookings.filter(pnr__icontains=query)
+    if status_filter:
+        bookings = bookings.filter(status=status_filter)
+
+    return render(request, 'dashboard/staff_bookings.html', {
+        'bookings': bookings[:50],
+        'query': query,
+        'status_filter': status_filter,
+    })
+

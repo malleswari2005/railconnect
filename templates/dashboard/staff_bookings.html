@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Bookings Management Master – Staff Control | RailConnect{% endblock %}
+
+{% block content %}
+<div class="bg-dark text-white py-4 mb-4 border-bottom border-warning border-3">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <div class="badge bg-warning text-dark fw-bold mb-1">Reservation Registry</div>
+        <h1 class="h3 fw-bold mb-0">System Bookings & Passenger Inquiry</h1>
+      </div>
+      <div>
+        <a href="{% url 'dashboard:staff_dashboard' %}" class="btn btn-outline-light btn-sm">
+          &larr; Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <!-- Search & Filters -->
+  <div class="rc-card p-4 mb-4">
+    <form method="get" class="row g-3 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-1">Search by PNR</label>
+        <input type="text" class="form-control" name="q" value="{{ query }}" placeholder="Enter 10-digit PNR...">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-1">Filter by Status</label>
+        <select name="status" class="form-select">
+          <option value="">All Statuses</option>
+          <option value="CONFIRMED" {% if status_filter == 'CONFIRMED' %}selected{% endif %}>Confirmed</option>
+          <option value="WAITLISTED" {% if status_filter == 'WAITLISTED' %}selected{% endif %}>Waitlisted</option>
+          <option value="CANCELLED" {% if status_filter == 'CANCELLED' %}selected{% endif %}>Cancelled</option>
+          <option value="PENDING" {% if status_filter == 'PENDING' %}selected{% endif %}>Pending Payment</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-rc-primary w-100">Filter Records</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="rc-card p-4">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle table-striped table-bordered mb-0">
+        <thead class="table-light small">
+          <tr>
+            <th>PNR</th>
+            <th>Booked By</th>
+            <th>Train</th>
+            <th>Journey Date</th>
+            <th>Route</th>
+            <th>Status</th>
+            <th class="text-end">Fare</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bookings %}
+            <tr>
+              <td><span class="font-monospace fw-bold">{{ b.pnr }}</span></td>
+              <td>{{ b.user.username }} <small class="text-muted d-block">{{ b.contact_phone }}</small></td>
+              <td>{{ b.train.train_number }} ({{ b.class_code }})</td>
+              <td>{{ b.journey_date|date:"d M Y" }}</td>
+              <td>{{ b.from_station.code }} &rarr; {{ b.to_station.code }}</td>
+              <td>
+                {% if b.status == 'CONFIRMED' %}
+                  <span class="badge bg-success">CONFIRMED</span>
+                {% elif b.status == 'WAITLISTED' %}
+                  <span class="badge bg-warning text-dark">WAITLISTED</span>
+                {% elif b.status == 'CANCELLED' %}
+                  <span class="badge bg-danger">CANCELLED</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ b.status }}</span>
+                {% endif %}
+              </td>
+              <td class="text-end fw-bold">₹{{ b.total_fare }}</td>
+              <td class="text-center">
+                <a href="{% url 'bookings:ticket_detail' b.pnr %}" class="btn btn-sm btn-outline-primary" target="_blank">
+                  View Slip
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="8" class="text-center text-muted">No matching bookings found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
