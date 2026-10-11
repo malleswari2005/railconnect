@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+
+{% block title %}Passenger Details – {{ train.train_number }} {{ train.name }} | RailConnect{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4 mb-4">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <span class="badge bg-warning text-dark fw-bold mb-1">{{ train.train_number }} - {{ train.name }}</span>
+        <h2 class="h3 fw-bold mb-0">
+          {{ from_station.name }} ({{ from_station.code }}) &rarr; {{ to_station.name }} ({{ to_station.code }})
+        </h2>
+        <div class="small opacity-75 mt-1">
+          📅 {{ journey_date|date:"D, d M Y" }} &bull; Class: <strong>{{ class_code }}</strong> &bull; Distance: {{ distance_km }} km
+        </div>
+      </div>
+      <div>
+        <span class="badge bg-light text-primary fs-6 p-2">
+          Base Fare: ₹{{ single_fare }} / Passenger
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row g-4">
+    <!-- Left Column: Forms -->
+    <div class="col-lg-8">
+      <form method="post" id="bookingForm" class="prevent-double-submit" novalidate>
+        {% csrf_token %}
+
+        <!-- Passenger Entries Card -->
+        <div class="rc-card p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+            <div>
+              <h4 class="h5 fw-bold text-dark mb-0">Passenger Details (Max 6)</h4>
+              <span class="small text-muted">Enter details as per government ID proof</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="addPassengerBtn">
+              ➕ Add Passenger
+            </button>
+          </div>
+
+          {{ formset.management_form }}
+
+          <div id="passengerContainer">
+            {% for form in formset %}
+              <div class="passenger-row border rounded p-3 mb-3 bg-light">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="fw-bold text-primary mb-0 passenger-title">Passenger #{{ forloop.counter }}</h6>
+                  {% if not forloop.first %}
+                    <button type="button" class="btn btn-sm text-danger remove-passenger-btn">✕ Remove</button>
+                  {% endif %}
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-5">
+                    <label class="form-label small fw-semibold">Full Name <span class="text-danger">*</span></label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="text-danger small">{{ form.name.errors.0 }}</div>{% endif %}
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label small fw-semibold">Age <span class="text-danger">*</span></label>
+                    {{ form.age }}
+                    {% if form.age.errors %}<div class="text-danger small">{{ form.age.errors.0 }}</div>{% endif %}
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label small fw-semibold">Gender <span class="text-danger">*</span></label>
+                    {{ form.gender }}
+                  </div>
+                  <div class="col-md-3">
+                    <label class="form-label small fw-semibold">Berth Preference</label>
+                    {{ form.berth_preference }}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Contact Information Card -->
+        <div class="rc-card p-4 mb-4">
+          <h4 class="h5 fw-bold text-dark mb-3">Ticket Delivery Contact Info</h4>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email for Digital Ticket <span class="text-danger">*</span></label>
+              {{ contact_form.contact_email }}
+              {% if contact_form.contact_email.errors %}<div class="text-danger small">{{ contact_form.contact_email.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Mobile Number for SMS / Updates <span class="text-danger">*</span></label>
+              {{ contact_form.contact_phone }}
+              {% if contact_form.contact_phone.errors %}<div class="text-danger small">{{ contact_form.contact_phone.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-between align-items-center">
+          <a href="/trains/search/?from_station={{ from_station.code }}&to_station={{ to_station.code }}&journey_date={{ date_str }}" class="btn btn-outline-secondary">
+            &larr; Back to Trains
+          </a>
+          <button type="submit" class="btn btn-rc-orange px-4 py-2 fs-6 fw-bold">
+            Review Booking &rarr;
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Right Column: Fare & Journey Summary -->
+    <div class="col-lg-4">
+      <div class="rc-card p-4 sticky-top" style="top: 85px;">
+        <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">Fare Summary</h5>
+
+        <div class="d-flex justify-content-between mb-2 small">
+          <span class="text-muted">Travel Class:</span>
+          <strong>{{ class_code }}</strong>
+        </div>
+        <div class="d-flex justify-content-between mb-2 small">
+          <span class="text-muted">Current Availability:</span>
+          {% if inventory.available_seats > 0 %}
+            <span class="text-success fw-bold">Available ({{ inventory.available_seats }} Berths)</span>
+          {% else %}
+            <span class="text-warning fw-bold">Waitlist (WL {{ inventory.waitlist_count|add:1 }})</span>
+          {% endif %}
+        </div>
+        <div class="d-flex justify-content-between mb-2 small">
+          <span class="text-muted">Fare per Passenger:</span>
+          <span>₹{{ single_fare }}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-2 small">
+          <span class="text-muted">Passenger Count:</span>
+          <span id="passengerCountDisplay">1</span>
+        </div>
+
+        <hr>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="fw-bold text-dark">Total Estimated Fare:</span>
+          <span class="fs-4 fw-bold text-primary" id="totalFareDisplay">₹{{ single_fare }}</span>
+        </div>
+
+        <div class="alert alert-info small mb-0">
+          💡 <strong>Safe Allocation</strong>: Berths are verified and atomically reserved upon confirmation. No double-bookings.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Simple script to update fare display on passenger count change
+  const singleFare = parseFloat("{{ single_fare }}");
+  const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+  const container = document.getElementById('passengerContainer');
+  const addBtn = document.getElementById('addPassengerBtn');
+
+  function updateTotals() {
+    const rows = container.querySelectorAll('.passenger-row');
+    const count = rows.length;
+    document.getElementById('passengerCountDisplay').innerText = count;
+    document.getElementById('totalFareDisplay').innerText = '₹' + (singleFare * count).toFixed(2);
+  }
+
+  if (addBtn) {
+    addBtn.addEventListener('click', function () {
+      let count = parseInt(totalForms.value);
+      if (count >= 6) {
+        alert('Maximum 6 passengers allowed per booking.');
+        return;
+      }
+      const firstRow = container.querySelector('.passenger-row');
+      const newRow = firstRow.cloneNode(true);
+      
+      // Update form indices
+      newRow.innerHTML = newRow.innerHTML.replaceAll('-0-', `-${count}-`);
+      newRow.querySelector('.passenger-title').innerText = `Passenger #${count + 1}`;
+      
+      // Clear inputs
+      newRow.querySelectorAll('input').forEach(i => i.value = '');
+      
+      // Add remove button if not exists
+      if (!newRow.querySelector('.remove-passenger-btn')) {
+        const topBar = newRow.querySelector('.d-flex');
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn btn-sm text-danger remove-passenger-btn';
+        removeBtn.innerText = '✕ Remove';
+        topBar.appendChild(removeBtn);
+      }
+
+      container.appendChild(newRow);
+      totalForms.value = count + 1;
+      updateTotals();
+    });
+  }
+
+  container.addEventListener('click', function(e) {
+    if (e.target.classList.contains('remove-passenger-btn')) {
+      const rows = container.querySelectorAll('.passenger-row');
+      if (rows.length > 1) {
+        e.target.closest('.passenger-row').remove();
+        totalForms.value = container.querySelectorAll('.passenger-row').length;
+        updateTotals();
+      }
+    }
+  });
+
+  updateTotals();
+</script>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block title %}Digital E-Ticket – PNR {{ booking.pnr }} | RailConnect{% endblock %}
+
+{% block content %}
+<div class="container py-4 pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <!-- Action Toolbar -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <a href="/dashboard/my-bookings/" class="btn btn-outline-secondary btn-sm">
+          &larr; Back to My Bookings
+        </a>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print();">
+            🖨️ Print Ticket
+          </button>
+          <a href="{% url 'bookings:ticket_pdf' booking.pnr %}" class="btn btn-rc-orange btn-sm fw-bold">
+            📥 Download Vector PDF
+          </a>
+        </div>
+      </div>
+
+      <!-- Electronic Ticket Voucher -->
+      <div class="ticket-wrapper shadow-sm">
+        <div class="ticket-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <span class="fs-4">🚆</span>
+              <h2 class="h4 fw-bold text-dark mb-0">Rail<span style="color: #ff7a00;">Connect</span> Electronic Reservation Slip</h2>
+            </div>
+            <span class="small text-muted">Ministry of Railways &bull; Educational MCA Demonstration System</span>
+          </div>
+
+          <div class="text-end">
+            <span class="small text-muted d-block text-uppercase">PNR Number</span>
+            <div class="ticket-pnr">{{ booking.pnr }}</div>
+          </div>
+        </div>
+
+        <!-- Train Details Card -->
+        <div class="row g-3 mb-4 pb-3 border-bottom">
+          <div class="col-md-4">
+            <span class="small text-muted d-block">Train:</span>
+            <strong>{{ booking.train.train_number }} - {{ booking.train.name }}</strong>
+            <span class="badge bg-secondary ms-1 small">{{ booking.train.get_train_type_display }}</span>
+          </div>
+          <div class="col-md-2">
+            <span class="small text-muted d-block">Date of Journey:</span>
+            <strong>{{ booking.journey_date|date:"d M Y" }}</strong>
+          </div>
+          <div class="col-md-2">
+            <span class="small text-muted d-block">Travel Class:</span>
+            <span class="badge bg-dark fs-6">{{ booking.class_code }}</span>
+          </div>
+          <div class="col-md-2">
+            <span class="small text-muted d-block">Booking Status:</span>
+            {% if booking.status == 'CONFIRMED' %}
+              <span class="badge bg-success">CONFIRMED</span>
+            {% elif booking.status == 'WAITLISTED' %}
+              <span class="badge bg-warning text-dark">WAITLISTED</span>
+            {% else %}
+              <span class="badge bg-danger">{{ booking.get_status_display }}</span>
+            {% endif %}
+          </div>
+          <div class="col-md-2 text-md-end">
+            <span class="small text-muted d-block">Total Fare Paid:</span>
+            <strong class="text-primary fs-5">₹{{ booking.total_fare }}</strong>
+          </div>
+        </div>
+
+        <!-- Route Bar -->
+        <div class="p-3 bg-white rounded border mb-4">
+          <div class="row align-items-center text-center">
+            <div class="col-5 text-start">
+              <div class="fs-5 fw-bold text-dark">{{ booking.from_station.name }}</div>
+              <div class="badge bg-primary fs-6">{{ booking.from_station.code }}</div>
+            </div>
+            <div class="col-2 text-center text-muted">
+              <span class="fs-4">&rarr;</span>
+            </div>
+            <div class="col-5 text-end">
+              <div class="fs-5 fw-bold text-dark">{{ booking.to_station.name }}</div>
+              <div class="badge bg-primary fs-6">{{ booking.to_station.code }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passengers & Berths -->
+        <h5 class="h6 fw-bold text-dark mb-3">Passenger & Seat Allocation Details</h5>
+        <div class="table-responsive mb-4">
+          <table class="table table-bordered align-middle bg-white mb-0">
+            <thead class="table-light small">
+              <tr>
+                <th style="width: 40px;" class="text-center">#</th>
+                <th>Passenger Name</th>
+                <th class="text-center">Age</th>
+                <th class="text-center">Gender</th>
+                <th class="text-center">Booking Status</th>
+                <th class="text-center">Coach & Berth</th>
+                <th class="text-end">Fare</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for p in passengers %}
+                <tr>
+                  <td class="text-center">{{ forloop.counter }}</td>
+                  <td><strong>{{ p.name }}</strong></td>
+                  <td class="text-center">{{ p.age }}</td>
+                  <td class="text-center">{{ p.get_gender_display }}</td>
+                  <td class="text-center">
+                    {% if p.status == 'CONFIRMED' %}
+                      <span class="badge bg-success">CNF</span>
+                    {% elif p.status == 'WAITLISTED' %}
+                      <span class="badge bg-warning text-dark">WL #{{ p.waitlist_number }}</span>
+                    {% else %}
+                      <span class="badge bg-danger">CANCELLED</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    {% if p.allocated_seat %}
+                      <span class="badge bg-primary fs-6">{{ p.allocated_seat.coach.coach_code }} / {{ p.allocated_seat.seat_number }}</span>
+                      <div class="small text-muted">{{ p.allocated_seat.get_berth_type_display }}</div>
+                    {% elif p.status == 'WAITLISTED' %}
+                      <span class="badge bg-warning text-dark">Waitlist {{ p.waitlist_number }}</span>
+                    {% else %}
+                      <span class="text-muted small">Released</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">₹{{ p.fare }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- QR Code & Ticket Verification -->
+        <div class="row align-items-center pt-3 border-top g-3">
+          <div class="col-md-3 text-center text-md-start">
+            {% if qr_base64 %}
+              <img src="data:image/png;base64,{{ qr_base64 }}" alt="Ticket QR Code" class="img-fluid border p-1 rounded" style="max-width: 130px;">
+              <div class="small text-muted mt-1" style="font-size: 0.7rem;">Scan for Verification</div>
+            {% endif %}
+          </div>
+          <div class="col-md-9">
+            <h6 class="fw-bold small text-dark mb-1">Travel Instructions & Compliance:</h6>
+            <ul class="small text-muted ps-3 mb-0" style="font-size: 0.78rem;">
+              <li>At least one passenger on this ticket must carry a valid original Government Photo Identity Card.</li>
+              <li>This digital E-Ticket Slip (ERS) is valid alongside photo identity without printing a physical paper slip.</li>
+              <li>Standard educational cancellation policy applies: &gt;48 hrs: 90% refund, 12-48 hrs: 50% refund, &lt;12 hrs: 0% refund.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}PNR Status Inquiry – RailConnect{% endblock %}
+
+{% block content %}
+<div class="rc-hero-section py-4">
+  <div class="container text-center">
+    <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-1 rounded-pill mb-2">
+      <span class="badge bg-warning text-dark">Live Inquiry</span>
+      <span class="small text-white">Passenger Name Record (PNR) Verification</span>
+    </div>
+    <h1 class="h2 fw-bold text-white mb-2">Check Passenger PNR Status</h1>
+    <p class="text-white opacity-75 small mx-auto mb-0" style="max-width: 600px;">
+      Enter your 10-digit booking reference to check real-time berth allocation and coach status.
+    </p>
+  </div>
+</div>
+
+<div class="container my-4 pb-5">
+  <!-- PNR Search Box -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-lg-6 col-md-8">
+      <div class="rc-card p-4">
+        <form method="get" class="row g-2 align-items-center">
+          <div class="col-8">
+            <label for="pnrInput" class="form-label small fw-bold text-muted text-uppercase mb-1">Enter 10-Digit PNR</label>
+            <input type="text" class="form-control form-control-lg fs-6 font-monospace" id="pnrInput" name="pnr" value="{{ pnr_query }}" placeholder="e.g. 2489012345" maxlength="10" required autocomplete="off">
+          </div>
+          <div class="col-4">
+            <label class="form-label d-block small mb-1">&nbsp;</label>
+            <button type="submit" class="btn btn-rc-orange btn-lg w-100 fs-6 py-2 fw-semibold">
+              Get Status
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% if booking %}
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="rc-card p-4">
+          <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom mb-4 gap-2">
+            <div>
+              <span class="small text-muted d-block text-uppercase">PNR Number</span>
+              <span class="fs-4 fw-bold font-monospace text-primary">{{ booking.pnr }}</span>
+            </div>
+            <div>
+              {% if booking.status == 'CONFIRMED' %}
+                <span class="badge-confirmed fs-6">CONFIRMED (CNF)</span>
+              {% elif booking.status == 'WAITLISTED' %}
+                <span class="badge-waitlist fs-6">WAITLISTED (WL)</span>
+              {% elif booking.status == 'CANCELLED' %}
+                <span class="badge-cancelled fs-6">CANCELLED</span>
+              {% else %}
+                <span class="badge bg-secondary fs-6">{{ booking.get_status_display }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Train summary -->
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <span class="small text-muted d-block">Train:</span>
+              <strong>{{ booking.train.train_number }} - {{ booking.train.name }}</strong>
+            </div>
+            <div class="col-md-3">
+              <span class="small text-muted d-block">Date of Journey:</span>
+              <strong>{{ booking.journey_date|date:"d M Y" }}</strong>
+            </div>
+            <div class="col-md-3">
+              <span class="small text-muted d-block">Travel Class:</span>
+              <span class="badge bg-dark">{{ booking.class_code }}</span>
+            </div>
+            <div class="col-md-6">
+              <span class="small text-muted d-block">From:</span>
+              <strong>{{ booking.from_station.name }} ({{ booking.from_station.code }})</strong>
+            </div>
+            <div class="col-md-6">
+              <span class="small text-muted d-block">To:</span>
+              <strong>{{ booking.to_station.name }} ({{ booking.to_station.code }})</strong>
+            </div>
+          </div>
+
+          <!-- Passenger Statuses -->
+          <h5 class="h6 fw-bold text-dark mb-3">Passenger Current Status</h5>
+          <div class="table-responsive">
+            <table class="table table-bordered mb-0 align-middle">
+              <thead class="table-light small">
+                <tr>
+                  <th style="width: 40px;">#</th>
+                  <th>Passenger</th>
+                  <th>Booking Status</th>
+                  <th>Current Berth / Coach</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in booking.passengers.all %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ p.name }}</strong></td>
+                    <td>
+                      {% if p.status == 'CONFIRMED' %}
+                        <span class="badge bg-success">CNF</span>
+                      {% elif p.status == 'WAITLISTED' %}
+                        <span class="badge bg-warning text-dark">WL #{{ p.waitlist_number }}</span>
+                      {% else %}
+                        <span class="badge bg-danger">CAN</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if p.allocated_seat %}
+                        <span class="fw-bold text-primary">{{ p.allocated_seat.coach.coach_code }} - Seat {{ p.allocated_seat.seat_number }}</span> 
+                        <span class="badge bg-light text-dark border ms-1 small">{{ p.allocated_seat.get_berth_type_display }}</span>
+                      {% elif p.status == 'WAITLISTED' %}
+                        <span class="text-warning fw-semibold">Waitlist Position: WL {{ p.waitlist_number }}</span>
+                      {% else %}
+                        <span class="text-muted">Cancelled</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="alert alert-secondary small mt-4 mb-0">
+            🔒 <strong>Privacy Guard</strong>: Personal contact numbers and identification proofs are strictly sanitized from public PNR inquiry responses.
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
