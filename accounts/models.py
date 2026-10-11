@@ -35,3 +35,17 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
     else:
         if hasattr(instance, 'profile'):
             instance.profile.save()
+
+class FavoriteRoute(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite_routes')
+    from_station = models.ForeignKey('trains.Station', on_delete=models.CASCADE, related_name='+')
+    to_station = models.ForeignKey('trains.Station', on_delete=models.CASCADE, related_name='+')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [('user', 'from_station', 'to_station')]
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username}: {self.from_station.code} -> {self.to_station.code}"
+

@@ -181,3 +181,39 @@ def staff_bookings_view(request):
         'status_filter': status_filter,
     })
 
+@login_required
+def booking_audit_logs_view(request, pnr):
+    """Inspects complete immutable audit trail of actions taken on a booking."""
+    booking = get_object_or_404(Booking, pnr=pnr)
+    if booking.user != request.user and not request.user.is_staff:
+        messages.error(request, "Unauthorized access.")
+        return redirect('dashboard:my_bookings')
+
+    logs = booking.audit_logs.all().order_by('created_at')
+    return render(request, 'dashboard/booking_logs.html', {
+        'booking': booking,
+        'logs': logs,
+    })
+
+@login_required
+def toggle_favorite_route_view(request):
+    """Saves or removes a favorite station pair for quick repeat searches."""
+    from_code = request.GET.get('from', '').strip().upper()
+    to_code = request.GET.get('to', '').strip().upper()
+
+    from_st = Station.objects.filter(code=from_code).first()
+    to_st = Station.objects.filter(code=to_code).first()
+
+    if from_st and to_st:
+        from accounts.models import FavoriteRoute
+        fav = FavoriteRoute.objects.filter(user=request.user, from_station=from_st, to_station=to_st).first()
+        if fav:
+            fav.delete()
+            messages.info(request, f"Removed {from_st.code} &rarr; {to_st.code} from favorites.")
+        else:
+            FavoriteRoute.objects.create(user=request.user, from_station=from_st, to_station=to_st)
+            messages.success(request, f"Saved {from_st.code} &rarr; {to_st.code} to your favorite routes!")
+
+    return redirect('dashboard:my_bookings')
+
+

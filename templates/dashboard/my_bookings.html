@@ -114,6 +114,9 @@
                     <a href="{% url 'bookings:ticket_pdf' b.pnr %}" class="btn btn-sm btn-outline-secondary">
                       📥 Download PDF
                     </a>
+                    <a href="{% url 'dashboard:booking_logs' b.pnr %}" class="btn btn-sm btn-outline-info">
+                      📋 Audit Log
+                    </a>
                   </div>
                   <div>
                     {% if b.status != 'CANCELLED' %}

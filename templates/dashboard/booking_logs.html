@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Audit Trail – PNR {{ booking.pnr }} | RailConnect{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4 mb-4">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <span class="badge bg-warning text-dark fw-bold mb-1">Audit Log Telemetry</span>
+        <h1 class="h3 fw-bold mb-0">Booking Lifecycle Timeline (PNR: {{ booking.pnr }})</h1>
+        <div class="small opacity-75 mt-1">
+          Train: <strong>{{ booking.train.train_number }} - {{ booking.train.name }}</strong> &bull; Current Status: <strong>{{ booking.get_status_display }}</strong>
+        </div>
+      </div>
+      <div>
+        <a href="{% url 'dashboard:my_bookings' %}" class="btn btn-outline-light btn-sm">
+          &larr; Back to My Bookings
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="rc-card p-4 p-md-5">
+        <h4 class="h5 fw-bold text-dark mb-4 pb-2 border-bottom">System Event History</h4>
+
+        <div class="position-relative ps-4 border-start border-3 border-primary ms-3">
+          {% for log in logs %}
+            <div class="mb-4 position-relative">
+              <!-- Timeline indicator -->
+              <div class="position-absolute translate-middle rounded-circle bg-primary border border-white"
+                   style="left: -19px; top: 12px; width: 16px; height: 16px;"></div>
+
+              <div class="card p-3 border shadow-sm">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-dark fs-6">{{ log.action }}</span>
+                  <span class="text-muted small">{{ log.created_at|date:"d M Y, H:i:s" }}</span>
+                </div>
+                <p class="text-secondary mb-0 small">{{ log.description }}</p>
+              </div>
+            </div>
+          {% empty %}
+            <div class="text-muted small">No audit history found for this booking.</div>
+          {% endfor %}
+        </div>
+
+        <div class="alert alert-secondary small mt-4 mb-0">
+          🔍 <strong>Audit Transparency</strong>: Every transition (creation, atomic seat assignment, payment authorization, waitlist advancement, cancellation) is permanently logged for examination verification.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
