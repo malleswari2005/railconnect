@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirm Cancellation – PNR {{ booking.pnr }} | RailConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="rc-card p-4 p-md-5">
+        <div class="text-center pb-3 border-bottom mb-4">
+          <span class="badge bg-danger mb-2">Ticket Cancellation & Refund Request</span>
+          <h2 class="h4 fw-bold text-dark">Confirm Booking Cancellation</h2>
+          <span class="small text-muted font-monospace">PNR: {{ booking.pnr }} &bull; Train: {{ booking.train.train_number }} - {{ booking.train.name }}</span>
+        </div>
+
+        <!-- Refund Policy Tier Matrix Card -->
+        <div class="card border-warning bg-warning bg-opacity-10 p-3 mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <span class="fs-2">⏱️</span>
+            <div>
+              <h6 class="fw-bold mb-1 text-dark">Applicable Refund Policy Tier:</h6>
+              <div class="small text-secondary mb-1">
+                <strong>{{ hours_before }} hours</strong> remaining before scheduled departure.
+              </div>
+              <div class="badge bg-dark fs-6">{{ tier_label }}</div>
+              <div class="small text-muted mt-2">
+                Eligible Refund Rate: <strong class="text-success">{{ refund_pct }}%</strong> &bull; Clerkage Charge: <strong class="text-danger">{{ clerkage_pct }}%</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form method="post" class="prevent-double-submit">
+          {% csrf_token %}
+
+          <h5 class="h6 fw-bold text-dark mb-3">Select Passengers to Cancel:</h5>
+          <div class="list-group mb-4">
+            {% for p in active_passengers %}
+              <label class="list-group-item d-flex align-items-center justify-content-between p-3">
+                <div class="d-flex align-items-center gap-3">
+                  <input class="form-check-input passenger-checkbox" type="checkbox" name="passenger_ids" value="{{ p.id }}" checked>
+                  <div>
+                    <strong class="text-dark">{{ p.name }}</strong>
+                    <div class="small text-muted">{{ p.get_gender_display }}, {{ p.age }} yrs &bull; Status: {{ p.get_status_display }}</div>
+                  </div>
+                </div>
+                <div class="text-end">
+                  <div class="fw-bold text-primary">₹{{ p.fare }}</div>
+                  <small class="text-muted">Estimated Refund: ₹{{ p.fare|floatformat:2 }}</small>
+                </div>
+              </label>
+            {% endfor %}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Cancellation Reason (Optional)</label>
+            <select name="cancellation_reason" class="form-select">
+              <option value="Change of travel plans">Change of travel plans</option>
+              <option value="Personal emergency">Personal emergency</option>
+              <option value="Waitlist ticket not confirmed">Waitlist ticket not confirmed</option>
+              <option value="Educational project simulation testing">Educational project simulation testing</option>
+            </select>
+          </div>
+
+          <div class="alert alert-info small mb-4">
+            ⚡ <strong>Automatic Waitlist Promotion</strong>: As soon as your seat is cancelled, the engine will immediately promote the earliest waitlisted passenger to your berth.
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{% url 'dashboard:my_bookings' %}" class="btn btn-outline-secondary">
+              &larr; Keep Booking (Back)
+            </a>
+            <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
+              Confirm & Process Cancellation
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

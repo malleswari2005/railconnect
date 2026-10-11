@@ -286,3 +286,105 @@ def promote_waitlist_on_seat_release(train, journey_date, class_code, released_s
                 inventory.booked_seats -= 1
             inventory.save()
             return None
+
+def cancel_booking_or_passengers(booking, passenger_ids=None, reason=""):
+    """
+    Cancels specified or all passengers, calculates tiered refund,
+    releases physical seats, and triggers waitlist auto-promotion.
+    """
+    with transaction.atomic():
+        now_dt = timezone.now()
+        dep_time = booking.train.departure_time or timezone.datetime.min.time()
+        # Localize or combine date and time
+        dep_dt = timezone.make_aware(
+            timezone.datetime.combine(booking.journey_date, dep_time),
+            timezone.get_current_timezone()
+        )
+        
+        hours_before = (dep_dt - now_dt).total_seconds() / 3600.0
+
+        # Refund tier calculation
+        if hours_before > 48:
+            refund_rate = Decimal('0.90') # 90% refund, 10% clerkage
+        elif hours_before >= 12:
+            refund_rate = Decimal('0.50') # 50% refund
+        else:
+            refund_rate = Decimal('0.00') # 0% refund
+
+        if passenger_ids:
+            passengers_to_cancel = booking.passengers.filter(id__in=passenger_ids, status__in=['CONFIRMED', 'WAITLISTED'])
+        else:
+            passengers_to_cancel = booking.passengers.filter(status__in=['CONFIRMED', 'WAITLISTED'])
+
+        if not passengers_to_cancel.exists():
+            return None
+
+        total_cancelled_fare = sum(p.fare for p in passengers_to_cancel)
+        refund_amount = round(total_cancelled_fare * refund_rate, 2)
+        cancellation_fee = total_cancelled_fare - refund_amount
+        cancelled_count = passengers_to_cancel.count()
+
+        for passenger in passengers_to_cancel:
+            if passenger.status == 'CONFIRMED' and passenger.allocated_seat:
+                seat = passenger.allocated_seat
+                # Remove physical lock
+                AllocatedJourneySeat.objects.filter(
+                    seat=seat,
+                    journey_date=booking.journey_date,
+                    passenger=passenger
+                ).delete()
+                passenger.allocated_seat = None
+                passenger.status = 'CANCELLED'
+                passenger.save()
+
+                # Trigger auto-promotion for released seat
+                promote_waitlist_on_seat_release(booking.train, booking.journey_date, booking.class_code, seat)
+            elif passenger.status == 'WAITLISTED':
+                passenger.status = 'CANCELLED'
+                passenger.save()
+                # Remove from waitlist queue
+                if hasattr(passenger, 'waitlist_entry'):
+                    wl_entry = passenger.waitlist_entry
+                    wl_pos = wl_entry.position
+                    wl_inv = wl_entry.inventory
+                    wl_entry.delete()
+
+                    # Shift subsequent waitlist positions forward
+                    subs = WaitlistEntry.objects.filter(inventory=wl_inv, position__gt=wl_pos, is_promoted=False)
+                    for s in subs:
+                        s.position -= 1
+                        s.save()
+                        s.passenger.waitlist_number = s.position
+                        s.passenger.save()
+
+                    if wl_inv.waitlist_count > 0:
+                        wl_inv.waitlist_count -= 1
+                        wl_inv.save()
+
+        # Update booking overall status
+        remaining_active = booking.passengers.filter(status__in=['CONFIRMED', 'WAITLISTED']).count()
+        if remaining_active == 0:
+            booking.status = 'CANCELLED'
+        else:
+            booking.status = 'PARTIALLY_CANCELLED'
+        booking.save()
+
+        from .models import Cancellation
+        cancellation = Cancellation.objects.create(
+            booking=booking,
+            cancelled_passengers_count=cancelled_count,
+            original_fare=total_cancelled_fare,
+            cancellation_fee=cancellation_fee,
+            refund_amount=refund_amount,
+            refund_status='COMPLETED',
+            cancellation_reason=reason
+        )
+
+        BookingLog.objects.create(
+            booking=booking,
+            action='CANCELLED',
+            description=f"Cancelled {cancelled_count} passenger(s). Original fare: Rs. {total_cancelled_fare}, Refund: Rs. {refund_amount} (Fee: Rs. {cancellation_fee}). Policy Tier: {int(refund_rate*100)}% refund."
+        )
+
+        return cancellation
+

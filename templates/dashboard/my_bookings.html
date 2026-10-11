@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings – RailConnect{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4 mb-4">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <h1 class="h3 fw-bold mb-1">My Bookings & Reservations</h1>
+        <div class="small opacity-75">
+          Passenger portal for <strong>{{ user.username }}</strong> &bull; Manage e-tickets, refunds, and cancellations
+        </div>
+      </div>
+      <div>
+        <a href="{% url 'core:home' %}" class="btn btn-rc-orange btn-sm fw-bold">
+          ➕ Book New Journey
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <!-- Nav Tabs -->
+  <ul class="nav nav-pills mb-4 gap-2" id="bookingTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active px-4 py-2 fw-semibold" id="upcoming-tab" data-bs-toggle="pill" data-bs-target="#upcoming" type="button" role="tab">
+        🚆 Upcoming Journeys <span class="badge bg-light text-primary ms-1">{{ upcoming_bookings|length }}</span>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link px-4 py-2 fw-semibold" id="past-tab" data-bs-toggle="pill" data-bs-target="#past" type="button" role="tab">
+        📜 Past Journeys <span class="badge bg-secondary ms-1">{{ past_bookings|length }}</span>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link px-4 py-2 fw-semibold" id="cancelled-tab" data-bs-toggle="pill" data-bs-target="#cancelled" type="button" role="tab">
+        ❌ Cancelled <span class="badge bg-danger ms-1">{{ cancelled_bookings|length }}</span>
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+  <div class="tab-content" id="bookingTabsContent">
+    <!-- 1. Upcoming Journeys -->
+    <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+      {% if upcoming_bookings %}
+        <div class="row g-4">
+          {% for b in upcoming_bookings %}
+            <div class="col-12">
+              <div class="rc-card p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom mb-3 gap-2">
+                  <div>
+                    <span class="small text-muted d-block text-uppercase">PNR Number</span>
+                    <span class="fs-5 fw-bold font-monospace text-primary">{{ b.pnr }}</span>
+                  </div>
+                  <div>
+                    {% if b.status == 'CONFIRMED' %}
+                      <span class="badge-confirmed">CONFIRMED (CNF)</span>
+                    {% elif b.status == 'WAITLISTED' %}
+                      <span class="badge-waitlist">WAITLISTED (WL)</span>
+                    {% elif b.status == 'PARTIALLY_CANCELLED' %}
+                      <span class="badge bg-warning text-dark">PARTIALLY CANCELLED</span>
+                    {% else %}
+                      <span class="badge bg-secondary">{{ b.get_status_display }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="row g-3 align-items-center mb-3">
+                  <div class="col-lg-4">
+                    <strong class="d-block text-dark">{{ b.train.train_number }} - {{ b.train.name }}</strong>
+                    <span class="small text-muted">Class: <span class="badge bg-dark">{{ b.class_code }}</span> &bull; {{ b.passengers.count }} Passenger{{ b.passengers.count|pluralize }}</span>
+                  </div>
+                  <div class="col-lg-5">
+                    <div class="d-flex align-items-center gap-2">
+                      <div>
+                        <strong>{{ b.from_station.code }}</strong>
+                        <div class="small text-muted" style="font-size: 0.75rem;">{{ b.from_station.name }}</div>
+                      </div>
+                      <span class="text-muted">&rarr;</span>
+                      <div>
+                        <strong>{{ b.to_station.code }}</strong>
+                        <div class="small text-muted" style="font-size: 0.75rem;">{{ b.to_station.name }}</div>
+                      </div>
+                      <span class="badge bg-light text-dark border ms-auto">
+                        📅 {{ b.journey_date|date:"d M Y" }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-lg-3 text-lg-end">
+                    <span class="small text-muted d-block">Total Fare Paid:</span>
+                    <strong class="text-primary fs-5">₹{{ b.total_fare }}</strong>
+                  </div>
+                </div>
+
+                <!-- Passengers summary -->
+                <div class="bg-light p-2 rounded mb-3 small">
+                  <strong>Passengers:</strong>
+                  {% for p in b.passengers.all %}
+                    <span class="badge bg-white text-dark border me-1">
+                      {{ p.name }} ({{ p.status }} {% if p.allocated_seat %}&bull; {{ p.allocated_seat.coach.coach_code }}-{{ p.allocated_seat.seat_number }}{% elif p.status == 'WAITLISTED' %}&bull; WL {{ p.waitlist_number }}{% endif %})
+                    </span>
+                  {% endfor %}
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 border-top">
+                  <div class="d-flex gap-2">
+                    <a href="{% url 'bookings:ticket_detail' b.pnr %}" class="btn btn-sm btn-outline-primary">
+                      🎫 View E-Ticket Slip
+                    </a>
+                    <a href="{% url 'bookings:ticket_pdf' b.pnr %}" class="btn btn-sm btn-outline-secondary">
+                      📥 Download PDF
+                    </a>
+                  </div>
+                  <div>
+                    {% if b.status != 'CANCELLED' %}
+                      <a href="{% url 'dashboard:cancel_booking' b.pnr %}" class="btn btn-sm btn-outline-danger">
+                        ❌ Cancel Ticket / Passengers
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="rc-card p-5 text-center my-3">
+          <div class="display-4 text-muted mb-3">🎫</div>
+          <h4 class="h5 fw-bold text-dark">No Upcoming Bookings Found</h4>
+          <p class="text-secondary small">You do not have any active upcoming train journeys scheduled.</p>
+          <a href="{% url 'core:home' %}" class="btn btn-rc-primary btn-sm px-3">Book a Train Now</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 2. Past Journeys -->
+    <div class="tab-pane fade" id="past" role="tabpanel">
+      {% if past_bookings %}
+        <div class="row g-3">
+          {% for b in past_bookings %}
+            <div class="col-12">
+              <div class="rc-card p-3 opacity-75">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>{{ b.train.train_number }} - {{ b.train.name }}</strong>
+                    <div class="small text-muted">{{ b.from_station.code }} &rarr; {{ b.to_station.code }} &bull; {{ b.journey_date|date:"d M Y" }}</div>
+                  </div>
+                  <div>
+                    <a href="{% url 'bookings:ticket_detail' b.pnr %}" class="btn btn-sm btn-outline-secondary">
+                      View Receipt (PNR: {{ b.pnr }})
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="rc-card p-4 text-center my-3">
+          <p class="text-muted small mb-0">No past travel history available.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- 3. Cancelled Bookings -->
+    <div class="tab-pane fade" id="cancelled" role="tabpanel">
+      {% if cancelled_bookings %}
+        <div class="row g-3">
+          {% for b in cancelled_bookings %}
+            <div class="col-12">
+              <div class="rc-card p-4 border-danger-subtle">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <div>
+                    <span class="badge bg-danger">CANCELLED</span>
+                    <strong class="ms-2 text-dark">{{ b.train.train_number }} - {{ b.train.name }}</strong>
+                    <span class="small text-muted">(PNR: {{ b.pnr }})</span>
+                  </div>
+                  <span class="small text-muted">Journey Date: {{ b.journey_date|date:"d M Y" }}</span>
+                </div>
+
+                {% for c in b.cancellations.all %}
+                  <div class="bg-light p-2 rounded small d-flex justify-content-between align-items-center mt-2 border">
+                    <div>
+                      <span>Cancelled {{ c.cancelled_passengers_count }} passenger(s) &bull; Fee Deducted: ₹{{ c.cancellation_fee }}</span>
+                    </div>
+                    <div>
+                      <span class="badge bg-success-subtle text-success">Demo Refund: ₹{{ c.refund_amount }} ({{ c.refund_status }})</span>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="rc-card p-4 text-center my-3">
+          <p class="text-muted small mb-0">No cancelled bookings.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

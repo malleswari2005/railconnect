@@ -163,6 +163,23 @@ class WaitlistEntry(models.Model):
     def __str__(self):
         return f"WL Position {self.position} - {self.passenger.name} ({self.inventory})"
 
+class Cancellation(models.Model):
+    """Tracks ticket cancellations, deductions, and demo refunds."""
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='cancellations')
+    cancelled_passengers_count = models.PositiveIntegerField(default=1)
+    original_fare = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    cancellation_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    refund_status = models.CharField(max_length=20, default='COMPLETED')
+    cancellation_reason = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Cancellation for PNR {self.booking.pnr} - Refund: ₹{self.refund_amount}"
+
 class BookingLog(models.Model):
     """Audit trail of booking actions."""
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='audit_logs')

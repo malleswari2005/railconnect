@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Coach, Seat, JourneyInventory, Booking, Passenger, AllocatedJourneySeat, WaitlistEntry, BookingLog
+from .models import Coach, Seat, JourneyInventory, Booking, Passenger, AllocatedJourneySeat, WaitlistEntry, BookingLog, Cancellation
 
 class SeatInline(admin.TabularInline):
     model = Seat
@@ -55,6 +55,12 @@ class AllocatedJourneySeatAdmin(admin.ModelAdmin):
 class WaitlistEntryAdmin(admin.ModelAdmin):
     list_display = ('booking', 'passenger', 'inventory', 'position', 'is_promoted', 'promoted_at')
     list_filter = ('is_promoted', 'inventory__class_code')
+
+@admin.register(Cancellation)
+class CancellationAdmin(admin.ModelAdmin):
+    list_display = ('booking', 'cancelled_passengers_count', 'refund_amount', 'cancellation_fee', 'created_at')
+    list_filter = ('refund_status', 'created_at')
+    search_fields = ('booking__pnr',)
 
 @admin.register(BookingLog)
 class BookingLogAdmin(admin.ModelAdmin):
