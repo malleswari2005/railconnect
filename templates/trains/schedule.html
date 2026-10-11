@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Timetable & Route for {{ train.train_number }} - {{ train.name }} | RailConnect{% endblock %}
+
+{% block content %}
+<div class="bg-primary text-white py-4 mb-4">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <span class="badge bg-warning text-dark fw-bold mb-1">{{ train.train_number }}</span>
+        <h2 class="h3 fw-bold mb-0">{{ train.name }}</h2>
+        <div class="small opacity-75 mt-1">
+          Route: {{ train.source_station.name }} ({{ train.source_station.code }}) &rarr; {{ train.destination_station.name }} ({{ train.destination_station.code }}) &bull; {{ train.distance_km }} km &bull; Type: {{ train.get_train_type_display }}
+        </div>
+      </div>
+      <div>
+        <a href="/trains/live-status/?train_number={{ train.train_number }}" class="btn btn-warning text-dark fw-bold btn-sm">
+          📡 Track Live Status
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="rc-card p-4">
+    <h4 class="h5 fw-bold text-dark mb-3">Complete Station Halts & Schedule</h4>
+
+    <div class="table-responsive">
+      <table class="table table-hover align-middle table-bordered mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="text-center" style="width: 60px;">#</th>
+            <th>Station Code</th>
+            <th>Station Name</th>
+            <th class="text-center">Arrival</th>
+            <th class="text-center">Departure</th>
+            <th class="text-center">Halt</th>
+            <th class="text-center">Distance</th>
+            <th class="text-center">Day</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for stop in stops %}
+            <tr {% if forloop.first or forloop.last %}class="table-active fw-bold"{% endif %}>
+              <td class="text-center">{{ stop.stop_order }}</td>
+              <td><span class="badge bg-dark">{{ stop.station.code }}</span></td>
+              <td>{{ stop.station.name }} <span class="text-muted small">({{ stop.station.city }})</span></td>
+              <td class="text-center">{{ stop.arrival_time|time:"H:i"|default:"Source" }}</td>
+              <td class="text-center">{{ stop.departure_time|time:"H:i"|default:"Destination" }}</td>
+              <td class="text-center">
+                {% if forloop.first or forloop.last %}-{% else %}{{ stop.halt_minutes }} min{% endif %}
+              </td>
+              <td class="text-center">{{ stop.distance_from_source_km }} km</td>
+              <td class="text-center">Day {{ stop.day_offset|add:1 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Classes configured -->
+    <div class="mt-4 pt-3 border-top">
+      <h5 class="h6 fw-bold text-dark mb-2">Coaches & Classes in Service:</h5>
+      <div class="d-flex flex-wrap gap-2">
+        {% for c in train.classes.all %}
+          <div class="badge bg-light text-dark border p-2">
+            <strong>{{ c.class_code }}</strong> &bull; {{ c.class_name }} ({{ c.total_coaches }} Coaches, {{ c.seats_per_coach }} Berths each)
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

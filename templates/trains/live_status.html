@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Simulated Live Running Status – RailConnect{% endblock %}
+
+{% block content %}
+<div class="rc-hero-section py-4">
+  <div class="container text-center">
+    <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-1 rounded-pill mb-2">
+      <span class="badge bg-warning text-dark">Simulation</span>
+      <span class="small text-white">Live Satellite & Signaling Tracker Simulator</span>
+    </div>
+    <h1 class="h2 fw-bold text-white mb-2">Train Live Running Status</h1>
+    <p class="text-white opacity-75 small mx-auto mb-0" style="max-width: 600px;">
+      Educational tracker calculating dynamic station positions based on scheduled timetables.
+    </p>
+  </div>
+</div>
+
+<div class="container my-4 pb-5">
+  <!-- Search Bar -->
+  <div class="rc-card p-4 mb-4">
+    <form method="get" class="row g-3 align-items-end justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <label for="trainNumber" class="form-label small fw-bold text-uppercase text-muted">Enter Train Number or Select Below</label>
+        <div class="input-group">
+          <span class="input-group-text bg-light">🚆</span>
+          <input type="text" class="form-control" id="trainNumber" name="train_number" value="{{ train_number }}" placeholder="e.g. 12301" required>
+        </div>
+      </div>
+      <div class="col-md-3 col-lg-2">
+        <button type="submit" class="btn btn-rc-orange w-100 py-2 fw-semibold">
+          Track Train
+        </button>
+      </div>
+    </form>
+
+    <!-- Quick Sample Train Pills -->
+    <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mt-3 pt-3 border-top">
+      <span class="small text-muted fw-semibold">Try sample trains:</span>
+      {% for t in sample_trains %}
+        <a href="?train_number={{ t.train_number }}" class="badge text-bg-light border text-decoration-none px-2 py-1 text-dark">
+          {{ t.train_number }} - {{ t.name }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if train %}
+    <div class="rc-card p-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom mb-4 gap-2">
+        <div>
+          <span class="badge bg-dark fs-6">{{ train.train_number }}</span>
+          <h3 class="h4 fw-bold text-dark d-inline ms-2">{{ train.name }}</h3>
+          <div class="text-muted small mt-1">
+            {{ train.source_station.name }} &rarr; {{ train.destination_station.name }}
+          </div>
+        </div>
+        <div>
+          <span class="badge bg-success-subtle text-success border border-success-subtle p-2 fs-6">
+            {{ current_status_summary }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Live Timeline -->
+      <h5 class="h6 fw-bold text-dark mb-3">Station Timeline & Halts</h5>
+      <div class="timeline position-relative ps-4 border-start border-3 border-primary ms-3">
+        {% for s in stops_status %}
+          <div class="mb-4 position-relative">
+            <!-- Timeline dot -->
+            <div class="position-absolute translate-middle rounded-circle border border-white"
+                 style="left: -19px; top: 12px; width: 18px; height: 18px; 
+                 background-color: {% if s.is_current %}#ff7a00{% elif s.is_passed %}#198754{% else %}#ced4da{% endif %};">
+            </div>
+
+            <div class="card p-3 border {% if s.is_current %}border-warning bg-warning bg-opacity-10{% elif s.is_passed %}border-success-subtle bg-light{% endif %} shadow-sm">
+              <div class="d-flex flex-wrap justify-content-between align-items-center">
+                <div>
+                  <span class="badge bg-dark me-2">{{ s.stop.station.code }}</span>
+                  <strong class="text-dark">{{ s.stop.station.name }}</strong>
+                  <span class="text-muted small ms-2">Stop #{{ s.stop.stop_order }} &bull; {{ s.stop.distance_from_source_km }} km</span>
+                </div>
+                <div class="text-end">
+                  {% if s.is_current %}
+                    <span class="badge bg-warning text-dark fw-bold">📍 Currently Near Here</span>
+                  {% elif s.is_passed %}
+                    <span class="badge bg-success small">Departed</span>
+                  {% else %}
+                    <span class="badge bg-secondary small">Upcoming</span>
+                  {% endif %}
+                  <div class="small text-muted mt-1">
+                    Scheduled: {{ s.stop.arrival_time|time:"H:i"|default:"Source" }} / {{ s.stop.departure_time|time:"H:i"|default:"End" }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
