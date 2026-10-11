@@ -1,0 +1,47 @@
+<footer class="rc-footer">
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-lg-4 col-md-6">
+        <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+          <span>Rail<span style="color: #ff7a00;">Connect</span></span>
+        </h5>
+        <p class="small text-light opacity-75">
+          Educational, high-concurrency Smart Railway Reservation System built with Django.
+          Demonstrates database normalization, atomic transaction locks, waitlist queues, and modern UI engineering.
+        </p>
+        <span class="badge bg-secondary">MCA Academic Project Demo</span>
+      </div>
+
+      <div class="col-lg-2 col-md-6">
+        <h6 class="text-white fw-semibold mb-3">Quick Links</h6>
+        <ul class="list-unstyled small mb-0">
+          <li class="mb-2"><a href="{% url 'core:home' %}">Search Trains</a></li>
+          <li class="mb-2"><a href="/bookings/pnr-lookup/">PNR Inquiry</a></li>
+          <li class="mb-2"><a href="/trains/live-status/">Live Status Simulator</a></li>
+          <li class="mb-2"><a href="{% url 'core:about' %}">Project Overview</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <h6 class="text-white fw-semibold mb-3">Viva Highlights</h6>
+        <ul class="list-unstyled small mb-0 text-light opacity-75">
+          <li class="mb-1">🔒 <strong>Row-level DB Locking</strong>: <code>select_for_update()</code></li>
+          <li class="mb-1">⚡ <strong>Atomic Waitlist Engine</strong>: Auto-promotion</li>
+          <li class="mb-1">💳 <strong>Demo Gateway</strong>: State machine</li>
+          <li class="mb-1">📄 <strong>PDF E-Tickets</strong>: ReportLab vector output</li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <h6 class="text-white fw-semibold mb-3">Refund Policy (Demo)</h6>
+        <p class="small text-light opacity-75 mb-1">&bull; &gt;48 hrs: 90% Refund (10% clerkage)</p>
+        <p class="small text-light opacity-75 mb-1">&bull; 12–48 hrs: 50% Refund</p>
+        <p class="small text-light opacity-75 mb-0">&bull; &lt;12 hrs: Non-refundable</p>
+      </div>
+    </div>
+
+    <div class="border-top border-secondary pt-3 text-center small text-light opacity-50">
+      &copy; {{ CURRENT_YEAR }} RailConnect MCA Project Team. Built for academic demonstration & educational use.
+    </div>
+  </div>
+</footer>

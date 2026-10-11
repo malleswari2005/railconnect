@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>{% block title %}RailConnect – Smart Railway Reservation System{% endblock %}</title>
+
+  <!-- Local Offline Bootstrap 5.3 CSS -->
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  {% include 'partials/_navbar.html' %}
+
+  <!-- Global Alerts & Messages -->
+  {% include 'partials/_messages.html' %}
+
+  <!-- Main Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  {% include 'partials/_footer.html' %}
+
+  <!-- Local Offline Bootstrap 5.3 JS Bundle -->
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+
+  <!-- Custom Client JavaScript -->
+  <script src="{% static 'js/main.js' %}"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

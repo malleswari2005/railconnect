@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}500 - Internal Server Signal Error | RailConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+      <div class="display-1 fw-bold text-warning mb-3">500</div>
+      <h2 class="h3 fw-bold text-dark mb-3">Signal System Halt</h2>
+      <p class="text-muted mb-4 lead">
+        An unexpected internal condition occurred in the signaling network. Our control room has logged this event.
+      </p>
+      <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'core:home' %}" class="btn btn-rc-primary px-4">
+          🚂 Return to Home
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

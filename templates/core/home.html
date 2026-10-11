@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Train Tickets – RailConnect Smart Railway Reservation{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="rc-hero-section">
+  <div class="container text-center py-4">
+    <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-1 rounded-pill mb-3">
+      <span class="rc-orange-badge">New</span>
+      <span class="small text-white">Next-Generation IRCTC-Style Educational Engine</span>
+    </div>
+    <h1 class="display-5 fw-bold mb-3">Connecting Destinations with Speed & Precision</h1>
+    <p class="lead opacity-75 mx-auto mb-4" style="max-width: 680px;">
+      Book confirmed seats with instant atomic allocation, fair waitlist promotion, and zero double bookings.
+    </p>
+  </div>
+</div>
+
+<!-- Booking Search Card -->
+<div class="container mb-5">
+  <div class="rc-hero-card">
+    <form action="/trains/search/" method="get" class="row g-3 align-items-end">
+      <!-- From Station -->
+      <div class="col-lg-3 col-md-6">
+        <label for="fromStation" class="form-label fw-bold text-secondary small text-uppercase mb-1">From Station</label>
+        <div class="input-group">
+          <span class="input-group-text bg-light text-primary">🚉</span>
+          <input type="text" class="form-control form-control-lg fs-6" id="fromStation" name="from_station" placeholder="e.g. NDLS or New Delhi" list="stationsList" required autocomplete="off">
+        </div>
+      </div>
+
+      <!-- To Station -->
+      <div class="col-lg-3 col-md-6">
+        <label for="toStation" class="form-label fw-bold text-secondary small text-uppercase mb-1">To Station</label>
+        <div class="input-group">
+          <span class="input-group-text bg-light text-primary">🏁</span>
+          <input type="text" class="form-control form-control-lg fs-6" id="toStation" name="to_station" placeholder="e.g. MMCT or Mumbai Central" list="stationsList" required autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Station Datalist (autocomplete) -->
+      <datalist id="stationsList">
+        <option value="NDLS">New Delhi (NDLS)</option>
+        <option value="MMCT">Mumbai Central (MMCT)</option>
+        <option value="HWH">Howrah Jn (HWH)</option>
+        <option value="SBC">KSR Bengaluru (SBC)</option>
+        <option value="MAS">Chennai Central (MAS)</option>
+        <option value="ADI">Ahmedabad Jn (ADI)</option>
+        <option value="CNB">Kanpur Central (CNB)</option>
+        <option value="PNBE">Patna Jn (PNBE)</option>
+        <option value="PUNE">Pune Jn (PUNE)</option>
+        <option value="HYB">Hyderabad Deccan (HYB)</option>
+        <option value="JAT">Jammu Tawi (JAT)</option>
+        <option value="BSB">Varanasi Jn (BSB)</option>
+        <option value="BPL">Bhopal Jn (BPL)</option>
+        <option value="GKP">Gorakhpur Jn (GKP)</option>
+        <option value="CDG">Chandigarh (CDG)</option>
+      </datalist>
+
+      <!-- Date of Journey -->
+      <div class="col-lg-3 col-md-6">
+        <label for="journeyDate" class="form-label fw-bold text-secondary small text-uppercase mb-1">Date of Journey</label>
+        <input type="date" class="form-control form-control-lg fs-6" id="journeyDate" name="journey_date" value="{{ today }}" min="{{ today }}" max="{{ max_date }}" required>
+      </div>
+
+      <!-- Search Button -->
+      <div class="col-lg-3 col-md-6">
+        <button type="submit" class="btn btn-rc-orange btn-lg w-100 fs-6 py-2">
+          🔍 Find Trains
+        </button>
+      </div>
+    </form>
+
+    <!-- Popular Quick Searches -->
+    <div class="mt-4 pt-3 border-top d-flex flex-wrap align-items-center gap-2">
+      <span class="small fw-semibold text-muted me-2">Popular Routes:</span>
+      {% for route in popular_routes %}
+        <a href="/trains/search/?from_station={{ route.from_code }}&to_station={{ route.to_code }}&journey_date={{ today }}" class="badge text-bg-light border text-decoration-none px-2 py-1 text-dark">
+          {{ route.from_name }} &rarr; {{ route.to_name }}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Educational Viva & Demo Fast-Track Card -->
+<div class="container mb-5">
+  <div class="card border-warning bg-warning bg-opacity-10 shadow-sm">
+    <div class="card-body p-4">
+      <div class="row align-items-center g-3">
+        <div class="col-lg-8">
+          <h5 class="fw-bold text-dark mb-1">🎓 Viva Examiner / Demo Quick-Start Credentials</h5>
+          <p class="small text-secondary mb-0">
+            For academic viva evaluation, demo accounts are pre-seeded with existing bookings, transaction histories, and staff access:
+          </p>
+          <div class="d-flex flex-wrap gap-3 mt-2 small font-monospace">
+            <div><span class="badge bg-dark">Staff Admin:</span> <code>staff_admin</code> / <code>AdminPass@123</code></div>
+            <div><span class="badge bg-primary">Demo Passenger:</span> <code>passenger1</code> / <code>Pass@123</code></div>
+            <div><span class="badge bg-secondary">Second User:</span> <code>passenger2</code> / <code>Pass@123</code></div>
+          </div>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <a href="/accounts/login/" class="btn btn-outline-dark btn-sm me-2">Log In</a>
+          <a href="/accounts/register/" class="btn btn-rc-orange btn-sm">Create New Account</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Architecture & Feature Highlights -->
+<div class="container mb-5">
+  <div class="row g-4">
+    <div class="col-md-4">
+      <div class="rc-card p-4 h-100">
+        <div class="rounded-3 bg-primary bg-opacity-10 p-3 d-inline-block text-primary mb-3">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+        </div>
+        <h5 class="fw-bold">Concurrency-Safe Engine</h5>
+        <p class="text-secondary small mb-0">
+          Uses database row locking (<code>select_for_update()</code>) inside <code>transaction.atomic</code> blocks. Eliminates race conditions and prevents double-booking berths.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="rc-card p-4 h-100">
+        <div class="rounded-3 bg-warning bg-opacity-10 p-3 d-inline-block text-warning mb-3">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        </div>
+        <h5 class="fw-bold">Fair Waitlist Promotion</h5>
+        <p class="text-secondary small mb-0">
+          When any passenger cancels a confirmed berth, the earliest waitlisted passenger is automatically promoted to confirmed with automated queue renumbering.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="rc-card p-4 h-100">
+        <div class="rounded-3 bg-success bg-opacity-10 p-3 d-inline-block text-success mb-3">
+          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+        </div>
+        <h5 class="fw-bold">Instant E-Ticket & QR</h5>
+        <p class="text-secondary small mb-0">
+          Generates professional downloadable PDF tickets powered by ReportLab with embedded QR codes for instant offline ticket verification.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

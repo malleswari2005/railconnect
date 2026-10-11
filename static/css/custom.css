@@ -1,0 +1,212 @@
+:root {
+  --rc-primary: #0b2545;
+  --rc-primary-dark: #071930;
+  --rc-primary-light: #133966;
+  --rc-orange: #ff7a00;
+  --rc-orange-hover: #e06900;
+  --rc-accent-blue: #134074;
+  --rc-light-bg: #f4f6fa;
+  --rc-card-border: #e2e8f0;
+  --rc-confirmed: #198754;
+  --rc-waitlist: #d97706;
+  --rc-cancelled: #dc3545;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--rc-light-bg);
+  color: #212529;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* Navbar */
+.rc-navbar {
+  background-color: var(--rc-primary);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.rc-navbar .navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #ffffff !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rc-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.88) !important;
+  font-weight: 500;
+  padding: 0.5rem 0.85rem;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.rc-navbar .nav-link:hover,
+.rc-navbar .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.rc-orange-badge {
+  background-color: var(--rc-orange);
+  color: #fff;
+  font-size: 0.72rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Buttons */
+.btn-rc-orange {
+  background-color: var(--rc-orange);
+  border-color: var(--rc-orange);
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-rc-orange:hover,
+.btn-rc-orange:focus {
+  background-color: var(--rc-orange-hover);
+  border-color: var(--rc-orange-hover);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(255, 122, 0, 0.35);
+}
+
+.btn-rc-primary {
+  background-color: var(--rc-primary);
+  border-color: var(--rc-primary);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.btn-rc-primary:hover,
+.btn-rc-primary:focus {
+  background-color: var(--rc-primary-dark);
+  border-color: var(--rc-primary-dark);
+  color: #ffffff;
+}
+
+/* Hero Section */
+.rc-hero-section {
+  background: linear-gradient(135deg, var(--rc-primary) 0%, var(--rc-accent-blue) 100%);
+  color: #ffffff;
+  padding: 3.5rem 0 4rem;
+  position: relative;
+}
+
+.rc-hero-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  color: #212529;
+  padding: 2rem;
+  margin-top: -2.5rem;
+  border: 1px solid var(--rc-card-border);
+}
+
+/* Ticket & Card Styling */
+.rc-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid var(--rc-card-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rc-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.rc-card-header {
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--rc-card-border);
+  font-weight: 600;
+  padding: 0.85rem 1.25rem;
+}
+
+/* Badges */
+.badge-confirmed {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.badge-waitlist {
+  background-color: #fff3cd;
+  color: #664d03;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.badge-cancelled {
+  background-color: #f8d7da;
+  color: #842029;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+/* Railway Ticket Styling */
+.ticket-wrapper {
+  background: #ffffff;
+  border: 2px dashed #94a3b8;
+  border-radius: 12px;
+  padding: 2rem;
+  position: relative;
+  background-color: #fafbfc;
+}
+
+.ticket-header {
+  border-bottom: 2px solid var(--rc-primary);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.ticket-pnr {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--rc-primary);
+}
+
+/* Footer */
+.rc-footer {
+  background-color: var(--rc-primary-dark);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+  padding: 2.5rem 0 1.5rem;
+  margin-top: auto;
+  border-top: 3px solid var(--rc-orange);
+}
+
+.rc-footer a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+
+.rc-footer a:hover {
+  color: var(--rc-orange);
+}
+
+/* Banner for Demo system */
+.demo-badge-bar {
+  background-color: #fff8e1;
+  border-bottom: 1px solid #ffe082;
+  color: #8d6e63;
+  font-size: 0.82rem;
+  padding: 4px 0;
+  text-align: center;
+  font-weight: 500;
+}

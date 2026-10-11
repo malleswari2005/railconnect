@@ -1,0 +1,95 @@
+{% load static %}
+<div class="demo-badge-bar d-none d-md-block">
+  <div class="container text-center">
+    <span>🎓 <strong>Educational Demo Platform</strong> &bull; Concurrency-Safe Seat Engine &bull; IRCTC-Style Architecture</span>
+  </div>
+</div>
+
+<nav class="navbar navbar-expand-lg rc-navbar sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'core:home' %}">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff7a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="3" width="16" height="16" rx="2"></rect>
+        <path d="M4 11h16"></path>
+        <path d="M12 3v8"></path>
+        <circle cx="8" cy="15" r="1"></circle>
+        <circle cx="16" cy="15" r="1"></circle>
+        <path d="M8 19l-3 3"></path>
+        <path d="M16 19l3 3"></path>
+      </svg>
+      <span>Rail<span style="color: #ff7a00;">Connect</span></span>
+    </a>
+
+    <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#rcNavbarContent" aria-controls="rcNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="rcNavbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">
+            <i class="bi bi-search"></i> Book Journey
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/bookings/pnr-lookup/">
+            <i class="bi bi-ticket-perforated"></i> PNR Status
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/trains/live-status/">
+            <i class="bi bi-broadcast"></i> Live Running Status
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'core:about' %}">
+            <i class="bi bi-info-circle"></i> About System
+          </a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        {% if user.is_authenticated %}
+          {% if user.is_staff %}
+            <li class="nav-item me-2">
+              <a class="btn btn-sm btn-outline-warning text-white fw-bold" href="/dashboard/staff/">
+                🛡️ Staff Dashboard
+              </a>
+            </li>
+          {% endif %}
+          <li class="nav-item me-2">
+            <a class="nav-link" href="/dashboard/my-bookings/">
+              🎫 My Bookings
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-white fw-bold d-flex align-items-center gap-1" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="bg-warning text-dark rounded-circle d-inline-flex justify-content-center align-items-center me-1" style="width: 28px; height: 28px; font-size: 0.85rem;">
+                {{ user.username|make_list|first|upper }}
+              </div>
+              {{ user.username }}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="/accounts/profile/">👤 Profile & Settings</a></li>
+              <li><a class="dropdown-item" href="/accounts/password-change/">🔑 Change Password</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="post" action="/accounts/logout/" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item text-danger">🚪 Logout</button>
+                </form>
+              </li>
+            </ul>
+          </li>
+        {% else %}
+          <li class="nav-item me-2">
+            <a class="nav-link" href="/accounts/login/">Log In</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-sm btn-rc-orange px-3" href="/accounts/register/">Register</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
