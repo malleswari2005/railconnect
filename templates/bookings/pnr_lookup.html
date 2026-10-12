@@ -3,15 +3,15 @@
 {% block title %}PNR Status Inquiry – RailConnect{% endblock %}
 
 {% block content %}
-<div class="rc-hero-section py-4">
+<div class="rc-search-header-bar py-4 text-white">
   <div class="container text-center">
-    <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-1 rounded-pill mb-2">
-      <span class="badge bg-warning text-dark">Live Inquiry</span>
-      <span class="small text-white">Passenger Name Record (PNR) Verification</span>
+    <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-15 px-3 py-1 rounded-pill mb-2">
+      <i class="bi bi-search text-warning"></i>
+      <span class="small fw-semibold">Instant Reservation Verification</span>
     </div>
-    <h1 class="h2 fw-bold text-white mb-2">Check Passenger PNR Status</h1>
-    <p class="text-white opacity-75 small mx-auto mb-0" style="max-width: 600px;">
-      Enter your 10-digit booking reference to check real-time berth allocation and coach status.
+    <h1 class="h2 fw-bold text-white mb-2">PNR Status Inquiry</h1>
+    <p class="text-white-50 small mx-auto mb-0" style="max-width: 600px;">
+      Enter your 10-digit Passenger Name Record (PNR) to check real-time seat confirmation and coach berth assignment.
     </p>
   </div>
 </div>
@@ -20,16 +20,19 @@
   <!-- PNR Search Box -->
   <div class="row justify-content-center mb-4">
     <div class="col-lg-6 col-md-8">
-      <div class="rc-card p-4">
+      <div class="rc-card p-4 shadow-sm">
         <form method="get" class="row g-2 align-items-center">
           <div class="col-8">
             <label for="pnrInput" class="form-label small fw-bold text-muted text-uppercase mb-1">Enter 10-Digit PNR</label>
-            <input type="text" class="form-control form-control-lg fs-6 font-monospace" id="pnrInput" name="pnr" value="{{ pnr_query }}" placeholder="e.g. 2489012345" maxlength="10" required autocomplete="off">
+            <div class="input-group">
+              <span class="input-group-text bg-light text-muted"><i class="bi bi-ticket-perforated"></i></span>
+              <input type="text" class="form-control font-monospace fs-6" id="pnrInput" name="pnr" value="{{ pnr_query }}" placeholder="e.g. 2489012345" maxlength="10" required autocomplete="off">
+            </div>
           </div>
           <div class="col-4">
             <label class="form-label d-block small mb-1">&nbsp;</label>
-            <button type="submit" class="btn btn-rc-orange btn-lg w-100 fs-6 py-2 fw-semibold">
-              Get Status
+            <button type="submit" class="btn btn-rc-primary w-100 fw-bold">
+              Check Status
             </button>
           </div>
         </form>
@@ -40,83 +43,85 @@
   {% if booking %}
     <div class="row justify-content-center">
       <div class="col-lg-8">
-        <div class="rc-card p-4">
+        <div class="rc-card p-4 shadow-sm">
           <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom mb-4 gap-2">
             <div>
-              <span class="small text-muted d-block text-uppercase">PNR Number</span>
+              <span class="small text-muted d-block text-uppercase fw-semibold" style="letter-spacing: 0.5px;">PNR Number</span>
               <span class="fs-4 fw-bold font-monospace text-primary">{{ booking.pnr }}</span>
             </div>
             <div>
               {% if booking.status == 'CONFIRMED' %}
-                <span class="badge-confirmed fs-6">CONFIRMED (CNF)</span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 fw-bold">CONFIRMED (CNF)</span>
               {% elif booking.status == 'WAITLISTED' %}
-                <span class="badge-waitlist fs-6">WAITLISTED (WL)</span>
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 fs-6 fw-bold">WAITLISTED (WL)</span>
               {% elif booking.status == 'CANCELLED' %}
-                <span class="badge-cancelled fs-6">CANCELLED</span>
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fs-6 fw-bold">CANCELLED</span>
               {% else %}
-                <span class="badge bg-secondary fs-6">{{ booking.get_status_display }}</span>
+                <span class="badge bg-secondary px-3 py-2 fs-6">{{ booking.get_status_display }}</span>
               {% endif %}
             </div>
           </div>
 
           <!-- Train summary -->
-          <div class="row g-3 mb-4">
+          <div class="row g-3 mb-4 p-3 bg-light rounded-3 border">
             <div class="col-md-6">
-              <span class="small text-muted d-block">Train:</span>
-              <strong>{{ booking.train.train_number }} - {{ booking.train.name }}</strong>
+              <span class="small text-muted d-block">Train Name & Number:</span>
+              <strong class="text-dark">{{ booking.train.train_number }} - {{ booking.train.name }}</strong>
             </div>
             <div class="col-md-3">
               <span class="small text-muted d-block">Date of Journey:</span>
-              <strong>{{ booking.journey_date|date:"d M Y" }}</strong>
+              <strong class="text-dark">{{ booking.journey_date|date:"d M Y" }}</strong>
             </div>
             <div class="col-md-3">
               <span class="small text-muted d-block">Travel Class:</span>
-              <span class="badge bg-dark">{{ booking.class_code }}</span>
+              <span class="badge bg-primary text-white">{{ booking.class_code }}</span>
             </div>
             <div class="col-md-6">
               <span class="small text-muted d-block">From:</span>
-              <strong>{{ booking.from_station.name }} ({{ booking.from_station.code }})</strong>
+              <strong class="text-dark">{{ booking.from_station.name }} ({{ booking.from_station.code }})</strong>
             </div>
             <div class="col-md-6">
               <span class="small text-muted d-block">To:</span>
-              <strong>{{ booking.to_station.name }} ({{ booking.to_station.code }})</strong>
+              <strong class="text-dark">{{ booking.to_station.name }} ({{ booking.to_station.code }})</strong>
             </div>
           </div>
 
           <!-- Passenger Statuses -->
-          <h5 class="h6 fw-bold text-dark mb-3">Passenger Current Status</h5>
-          <div class="table-responsive">
-            <table class="table table-bordered mb-0 align-middle">
-              <thead class="table-light small">
+          <h2 class="h6 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-people text-primary"></i> Passenger Berth Status
+          </h2>
+          <div class="table-responsive mb-4">
+            <table class="table table-hover table-bordered mb-0 align-middle">
+              <thead class="table-light small text-uppercase text-muted">
                 <tr>
-                  <th style="width: 40px;">#</th>
+                  <th style="width: 40px;" class="text-center">#</th>
                   <th>Passenger</th>
-                  <th>Booking Status</th>
-                  <th>Current Berth / Coach</th>
+                  <th class="text-center">Booking Status</th>
+                  <th class="text-center">Current Berth / Coach</th>
                 </tr>
               </thead>
               <tbody>
                 {% for p in booking.passengers.all %}
                   <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td><strong>{{ p.name }}</strong></td>
-                    <td>
+                    <td class="text-center text-muted small">{{ forloop.counter }}</td>
+                    <td><strong class="text-dark">{{ p.name }}</strong> <span class="text-muted small">({{ p.age }} yrs)</span></td>
+                    <td class="text-center">
                       {% if p.status == 'CONFIRMED' %}
-                        <span class="badge bg-success">CNF</span>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">CONFIRMED</span>
                       {% elif p.status == 'WAITLISTED' %}
-                        <span class="badge bg-warning text-dark">WL #{{ p.waitlist_number }}</span>
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">WL #{{ p.waitlist_number }}</span>
                       {% else %}
-                        <span class="badge bg-danger">CAN</span>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ p.status }}</span>
                       {% endif %}
                     </td>
-                    <td>
+                    <td class="text-center">
                       {% if p.allocated_seat %}
-                        <span class="fw-bold text-primary">{{ p.allocated_seat.coach.coach_code }} - Seat {{ p.allocated_seat.seat_number }}</span> 
-                        <span class="badge bg-light text-dark border ms-1 small">{{ p.allocated_seat.get_berth_type_display }}</span>
+                        <span class="badge bg-primary text-white fw-bold">{{ p.allocated_seat.coach.coach_code }} - {{ p.allocated_seat.seat_number }}</span>
+                        <span class="small text-muted ms-1">({{ p.allocated_seat.get_berth_type_display }})</span>
                       {% elif p.status == 'WAITLISTED' %}
-                        <span class="text-warning fw-semibold">Waitlist Position: WL {{ p.waitlist_number }}</span>
+                        <span class="text-muted small">Waiting List #{{ p.waitlist_number }}</span>
                       {% else %}
-                        <span class="text-muted">Cancelled</span>
+                        <span class="text-muted small">-</span>
                       {% endif %}
                     </td>
                   </tr>
@@ -125,12 +130,30 @@
             </table>
           </div>
 
-          <div class="alert alert-secondary small mt-4 mb-0">
-            🔒 <strong>Privacy Guard</strong>: Personal contact numbers and identification proofs are strictly sanitized from public PNR inquiry responses.
+          <!-- Action Links -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-3 border-top">
+            <a href="{% url 'bookings:ticket_detail' booking.pnr %}" class="btn btn-rc-primary btn-sm px-4 fw-bold">
+              <i class="bi bi-receipt me-1"></i> View Full E-Ticket
+            </a>
+            <a href="{% url 'bookings:ticket_pdf' booking.pnr %}" class="btn btn-outline-secondary btn-sm px-3">
+              <i class="bi bi-download me-1"></i> Download PDF
+            </a>
           </div>
         </div>
       </div>
     </div>
+  {% else %}
+    {% if pnr_query %}
+      <div class="row justify-content-center">
+        <div class="col-lg-6">
+          <div class="rc-card p-5 text-center">
+            <i class="bi bi-exclamation-circle text-warning display-4 mb-3"></i>
+            <h3 class="h5 fw-bold text-dark">PNR Not Found</h3>
+            <p class="text-muted small">No active or past reservation matches PNR "{{ pnr_query }}". Please verify your 10-digit number and try again.</p>
+          </div>
+        </div>
+      </div>
+    {% endif %}
   {% endif %}
 </div>
 {% endblock %}

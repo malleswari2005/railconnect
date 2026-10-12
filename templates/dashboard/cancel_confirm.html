@@ -3,28 +3,46 @@
 {% block title %}Confirm Cancellation – PNR {{ booking.pnr }} | RailConnect{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="rc-search-header-bar py-3 text-white">
+  <div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <div>
+        <div class="small text-white-50 text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Reservation Management</div>
+        <h1 class="h4 fw-bold mb-0 text-white d-flex align-items-center gap-2">
+          <span>Cancel Booking & Refund Request</span>
+        </h1>
+        <div class="small text-white-50 mt-1">
+          PNR: <strong class="text-white">{{ booking.pnr }}</strong> &bull; Train: {{ booking.train.train_number }} - {{ booking.train.name }}
+        </div>
+      </div>
+      <div>
+        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 fs-6 fw-bold">
+          Cancellation Request
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4 pb-5">
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="rc-card p-4 p-md-5">
-        <div class="text-center pb-3 border-bottom mb-4">
-          <span class="badge bg-danger mb-2">Ticket Cancellation & Refund Request</span>
-          <h2 class="h4 fw-bold text-dark">Confirm Booking Cancellation</h2>
-          <span class="small text-muted font-monospace">PNR: {{ booking.pnr }} &bull; Train: {{ booking.train.train_number }} - {{ booking.train.name }}</span>
-        </div>
 
-        <!-- Refund Policy Tier Matrix Card -->
-        <div class="card border-warning bg-warning bg-opacity-10 p-3 mb-4">
+        <!-- RailConnect Cancellation Policy Tier Card -->
+        <div class="card border-warning bg-warning bg-opacity-10 p-3 mb-4 rounded-3">
           <div class="d-flex align-items-center gap-3">
-            <span class="fs-2">⏱️</span>
-            <div>
-              <h6 class="fw-bold mb-1 text-dark">Applicable Refund Policy Tier:</h6>
+            <div class="text-warning fs-2"><i class="bi bi-clock-history"></i></div>
+            <div class="flex-grow-1">
+              <h2 class="h6 fw-bold mb-1 text-dark">RailConnect Cancellation Policy</h2>
               <div class="small text-secondary mb-1">
                 <strong>{{ hours_before }} hours</strong> remaining before scheduled departure.
               </div>
-              <div class="badge bg-dark fs-6">{{ tier_label }}</div>
-              <div class="small text-muted mt-2">
-                Eligible Refund Rate: <strong class="text-success">{{ refund_pct }}%</strong> &bull; Clerkage Charge: <strong class="text-danger">{{ clerkage_pct }}%</strong>
+              <div class="d-flex align-items-center gap-2 flex-wrap mt-1">
+                <span class="badge bg-primary text-white fs-6">{{ tier_label }}</span>
+                <span class="small text-muted">Eligible Refund Rate: <strong class="text-success">{{ refund_pct }}%</strong></span>
+                <span class="small text-muted">&bull;</span>
+                <span class="small text-muted">Clerkage Charge: <strong class="text-danger">{{ clerkage_pct }}%</strong></span>
               </div>
             </div>
           </div>
@@ -33,48 +51,56 @@
         <form method="post" class="prevent-double-submit">
           {% csrf_token %}
 
-          <h5 class="h6 fw-bold text-dark mb-3">Select Passengers to Cancel:</h5>
+          <h3 class="h6 fw-bold text-dark mb-3">Select Passengers to Cancel:</h3>
           <div class="list-group mb-4">
             {% for p in active_passengers %}
-              <label class="list-group-item d-flex align-items-center justify-content-between p-3">
+              <label class="list-group-item d-flex align-items-center justify-content-between p-3 rounded-3 mb-2 border">
                 <div class="d-flex align-items-center gap-3">
-                  <input class="form-check-input passenger-checkbox" type="checkbox" name="passenger_ids" value="{{ p.id }}" checked>
+                  <input class="form-check-input passenger-checkbox flex-shrink-0" type="checkbox" name="passenger_ids" value="{{ p.id }}" checked>
                   <div>
-                    <strong class="text-dark">{{ p.name }}</strong>
+                    <strong class="text-dark d-block">{{ p.name }}</strong>
                     <div class="small text-muted">{{ p.get_gender_display }}, {{ p.age }} yrs &bull; Status: {{ p.get_status_display }}</div>
                   </div>
                 </div>
                 <div class="text-end">
                   <div class="fw-bold text-primary">₹{{ p.fare }}</div>
-                  <small class="text-muted">Estimated Refund: ₹{{ p.fare|floatformat:2 }}</small>
+                  <small class="text-muted">Estimated Base: ₹{{ p.fare|floatformat:2 }}</small>
                 </div>
               </label>
             {% endfor %}
           </div>
 
           <div class="mb-4">
-            <label class="form-label small fw-semibold">Cancellation Reason (Optional)</label>
+            <label class="form-label small fw-semibold text-dark">Reason for Cancellation (Optional)</label>
             <select name="cancellation_reason" class="form-select">
               <option value="Change of travel plans">Change of travel plans</option>
               <option value="Personal emergency">Personal emergency</option>
               <option value="Waitlist ticket not confirmed">Waitlist ticket not confirmed</option>
-              <option value="Educational project simulation testing">Educational project simulation testing</option>
+              <option value="Booking date / train error">Booking date / train error</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
-          <div class="alert alert-info small mb-4">
-            ⚡ <strong>Automatic Waitlist Promotion</strong>: As soon as your seat is cancelled, the engine will immediately promote the earliest waitlisted passenger to your berth.
+          <div class="alert alert-primary bg-primary bg-opacity-10 border border-primary-subtle small mb-4 rounded-3">
+            <div class="d-flex gap-2">
+              <i class="bi bi-arrow-repeat text-primary fs-5"></i>
+              <div>
+                <strong class="text-dark d-block">Automatic Waitlist Promotion</strong>
+                <span class="text-muted" style="font-size: 0.8rem;">Upon cancellation, released seats are automatically and immediately promoted to the next queued waitlisted passenger.</span>
+              </div>
+            </div>
           </div>
 
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
             <a href="{% url 'dashboard:my_bookings' %}" class="btn btn-outline-secondary">
-              &larr; Keep Booking (Back)
+              <i class="bi bi-arrow-left me-1"></i> Keep Booking (Back)
             </a>
             <button type="submit" class="btn btn-danger px-4 py-2 fw-bold">
-              Confirm & Process Cancellation
+              <i class="bi bi-check-circle me-1"></i> Confirm & Process Cancellation
             </button>
           </div>
         </form>
+
       </div>
     </div>
   </div>

@@ -6,61 +6,85 @@
 <div class="container py-4 pb-5">
   <div class="row justify-content-center">
     <div class="col-lg-9">
+
+      <!-- 4-Step Stepper: Step 4 Active -->
+      {% include 'partials/_booking_stepper.html' with active_step=4 %}
+
+      <!-- Success Confirmation Banner -->
+      <div class="card border-0 bg-success bg-opacity-10 rounded-3 p-3 mb-4 d-print-none">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+            <i class="bi bi-check-lg fs-3"></i>
+          </div>
+          <div class="flex-grow-1">
+            <h2 class="h5 fw-bold text-success mb-1">Booking Confirmed Successfully!</h2>
+            <p class="small text-secondary mb-0">
+              Your electronic reservation slip has been generated. Confirmation details have been dispatched to <strong>{{ booking.contact_email }}</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <!-- Action Toolbar -->
-      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 d-print-none gap-2">
         <a href="/dashboard/my-bookings/" class="btn btn-outline-secondary btn-sm">
-          &larr; Back to My Bookings
+          <i class="bi bi-arrow-left me-1"></i> Back to My Bookings
         </a>
         <div class="d-flex gap-2">
-          <button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print();">
-            🖨️ Print Ticket
+          <button type="button" class="btn btn-outline-dark btn-sm fw-semibold" onclick="window.print();">
+            <i class="bi bi-printer me-1"></i> Print Ticket
           </button>
-          <a href="{% url 'bookings:ticket_pdf' booking.pnr %}" class="btn btn-rc-orange btn-sm fw-bold">
-            📥 Download Vector PDF
+          <a href="{% url 'bookings:ticket_pdf' booking.pnr %}" class="btn btn-rc-primary btn-sm fw-bold">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Download Vector PDF
           </a>
         </div>
       </div>
 
-      <!-- Electronic Ticket Voucher -->
-      <div class="ticket-wrapper shadow-sm">
-        <div class="ticket-header d-flex flex-wrap justify-content-between align-items-center gap-3">
-          <div>
-            <div class="d-flex align-items-center gap-2">
-              <span class="fs-4">🚆</span>
-              <h2 class="h4 fw-bold text-dark mb-0">Rail<span style="color: #ff7a00;">Connect</span> Electronic Reservation Slip</h2>
+      <!-- Electronic Ticket Boarding Pass -->
+      <div class="ticket-wrapper shadow-sm border rounded-3 bg-white p-4 p-md-5 mb-4 position-relative">
+        <!-- Ticket Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 pb-3 border-bottom mb-4">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+              <i class="bi bi-train-front fs-4"></i>
             </div>
-            <span class="small text-muted">Ministry of Railways &bull; Educational MCA Demonstration System</span>
+            <div>
+              <div class="h4 fw-bold text-dark mb-0">
+                Rail<span style="color: #FF7A18;">Connect</span>
+              </div>
+              <div class="small text-muted">Electronic Reservation Slip (ERS) &bull; Verified Digital Ticket</div>
+            </div>
           </div>
 
-          <div class="text-end">
-            <span class="small text-muted d-block text-uppercase">PNR Number</span>
-            <div class="ticket-pnr">{{ booking.pnr }}</div>
+          <div class="text-md-end">
+            <span class="small text-muted d-block text-uppercase fw-semibold" style="letter-spacing: 0.5px;">PNR Number</span>
+            <div class="ticket-pnr fs-3 fw-bold font-monospace text-primary">{{ booking.pnr }}</div>
           </div>
         </div>
 
-        <!-- Train Details Card -->
+        <!-- Train Details Strip -->
         <div class="row g-3 mb-4 pb-3 border-bottom">
           <div class="col-md-4">
-            <span class="small text-muted d-block">Train:</span>
-            <strong>{{ booking.train.train_number }} - {{ booking.train.name }}</strong>
-            <span class="badge bg-secondary ms-1 small">{{ booking.train.get_train_type_display }}</span>
+            <span class="small text-muted d-block">Train Name & Number:</span>
+            <strong class="text-dark fs-6">{{ booking.train.train_number }} - {{ booking.train.name }}</strong>
+            <span class="badge bg-secondary-subtle text-secondary border ms-1 small">{{ booking.train.get_train_type_display }}</span>
           </div>
           <div class="col-md-2">
             <span class="small text-muted d-block">Date of Journey:</span>
-            <strong>{{ booking.journey_date|date:"d M Y" }}</strong>
+            <strong class="text-dark">{{ booking.journey_date|date:"d M Y" }}</strong>
           </div>
           <div class="col-md-2">
             <span class="small text-muted d-block">Travel Class:</span>
-            <span class="badge bg-dark fs-6">{{ booking.class_code }}</span>
+            <span class="badge bg-primary text-white fs-6">{{ booking.class_code }}</span>
           </div>
           <div class="col-md-2">
             <span class="small text-muted d-block">Booking Status:</span>
             {% if booking.status == 'CONFIRMED' %}
-              <span class="badge bg-success">CONFIRMED</span>
+              <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">CONFIRMED</span>
             {% elif booking.status == 'WAITLISTED' %}
-              <span class="badge bg-warning text-dark">WAITLISTED</span>
+              <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">WAITLISTED</span>
             {% else %}
-              <span class="badge bg-danger">{{ booking.get_status_display }}</span>
+              <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ booking.get_status_display }}</span>
             {% endif %}
           </div>
           <div class="col-md-2 text-md-end">
@@ -69,34 +93,43 @@
           </div>
         </div>
 
-        <!-- Route Bar -->
-        <div class="p-3 bg-white rounded border mb-4">
+        <!-- Boarding & Destination Card -->
+        <div class="p-3 bg-light rounded-3 border mb-4">
           <div class="row align-items-center text-center">
             <div class="col-5 text-start">
+              <span class="small text-muted d-block">Boarding Station</span>
               <div class="fs-5 fw-bold text-dark">{{ booking.from_station.name }}</div>
-              <div class="badge bg-primary fs-6">{{ booking.from_station.code }}</div>
+              <span class="badge bg-primary text-white">{{ booking.from_station.code }}</span>
             </div>
             <div class="col-2 text-center text-muted">
-              <span class="fs-4">&rarr;</span>
+              <i class="bi bi-arrow-right fs-4 text-primary"></i>
             </div>
             <div class="col-5 text-end">
+              <span class="small text-muted d-block">Destination Station</span>
               <div class="fs-5 fw-bold text-dark">{{ booking.to_station.name }}</div>
-              <div class="badge bg-primary fs-6">{{ booking.to_station.code }}</div>
+              <span class="badge bg-primary text-white">{{ booking.to_station.code }}</span>
             </div>
           </div>
         </div>
 
+        <!-- Perforated Dashed Line Divider -->
+        <div class="position-relative my-4">
+          <div class="border-top border-2 border-secondary border-dashed" style="border-style: dashed !important;"></div>
+        </div>
+
         <!-- Passengers & Berths -->
-        <h5 class="h6 fw-bold text-dark mb-3">Passenger & Seat Allocation Details</h5>
+        <h3 class="h6 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+          <i class="bi bi-people text-primary"></i> Passenger & Seat Allocation Details
+        </h3>
         <div class="table-responsive mb-4">
           <table class="table table-bordered align-middle bg-white mb-0">
-            <thead class="table-light small">
+            <thead class="table-light small text-uppercase text-muted">
               <tr>
                 <th style="width: 40px;" class="text-center">#</th>
                 <th>Passenger Name</th>
                 <th class="text-center">Age</th>
                 <th class="text-center">Gender</th>
-                <th class="text-center">Booking Status</th>
+                <th class="text-center">Status</th>
                 <th class="text-center">Coach & Berth</th>
                 <th class="text-end">Fare</th>
               </tr>
@@ -104,30 +137,30 @@
             <tbody>
               {% for p in passengers %}
                 <tr>
-                  <td class="text-center">{{ forloop.counter }}</td>
-                  <td><strong>{{ p.name }}</strong></td>
+                  <td class="text-center text-muted small">{{ forloop.counter }}</td>
+                  <td><strong class="text-dark">{{ p.name }}</strong></td>
                   <td class="text-center">{{ p.age }}</td>
                   <td class="text-center">{{ p.get_gender_display }}</td>
                   <td class="text-center">
                     {% if p.status == 'CONFIRMED' %}
-                      <span class="badge bg-success">CNF</span>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle fw-bold">CNF</span>
                     {% elif p.status == 'WAITLISTED' %}
-                      <span class="badge bg-warning text-dark">WL #{{ p.waitlist_number }}</span>
+                      <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle fw-bold">WL #{{ p.waitlist_number }}</span>
                     {% else %}
-                      <span class="badge bg-danger">CANCELLED</span>
+                      <span class="badge bg-danger-subtle text-danger border border-danger-subtle">CANCELLED</span>
                     {% endif %}
                   </td>
                   <td class="text-center">
                     {% if p.allocated_seat %}
-                      <span class="badge bg-primary fs-6">{{ p.allocated_seat.coach.coach_code }} / {{ p.allocated_seat.seat_number }}</span>
-                      <div class="small text-muted">{{ p.allocated_seat.get_berth_type_display }}</div>
+                      <span class="badge bg-primary text-white fs-6">{{ p.allocated_seat.coach.coach_code }} / {{ p.allocated_seat.seat_number }}</span>
+                      <div class="small text-muted mt-1">{{ p.allocated_seat.get_berth_type_display }}</div>
                     {% elif p.status == 'WAITLISTED' %}
-                      <span class="badge bg-warning text-dark">Waitlist {{ p.waitlist_number }}</span>
+                      <span class="badge bg-warning-subtle text-warning-emphasis">Waitlist {{ p.waitlist_number }}</span>
                     {% else %}
                       <span class="text-muted small">Released</span>
                     {% endif %}
                   </td>
-                  <td class="text-end">₹{{ p.fare }}</td>
+                  <td class="text-end fw-semibold">₹{{ p.fare }}</td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -138,19 +171,20 @@
         <div class="row align-items-center pt-3 border-top g-3">
           <div class="col-md-3 text-center text-md-start">
             {% if qr_base64 %}
-              <img src="data:image/png;base64,{{ qr_base64 }}" alt="Ticket QR Code" class="img-fluid border p-1 rounded" style="max-width: 130px;">
-              <div class="small text-muted mt-1" style="font-size: 0.7rem;">Scan for Verification</div>
+              <img src="data:image/png;base64,{{ qr_base64 }}" alt="Ticket QR Code" class="img-fluid border p-1 rounded-2 shadow-sm" style="max-width: 120px;">
+              <div class="small text-muted mt-1" style="font-size: 0.72rem;">Digital Ticket QR</div>
             {% endif %}
           </div>
           <div class="col-md-9">
-            <h6 class="fw-bold small text-dark mb-1">Travel Instructions & Compliance:</h6>
-            <ul class="small text-muted ps-3 mb-0" style="font-size: 0.78rem;">
-              <li>At least one passenger on this ticket must carry a valid original Government Photo Identity Card.</li>
-              <li>This digital E-Ticket Slip (ERS) is valid alongside photo identity without printing a physical paper slip.</li>
-              <li>Standard educational cancellation policy applies: &gt;48 hrs: 90% refund, 12-48 hrs: 50% refund, &lt;12 hrs: 0% refund.</li>
+            <h4 class="h6 fw-bold text-dark mb-1">Travel Instructions & Compliance</h4>
+            <ul class="small text-muted ps-3 mb-0" style="font-size: 0.8rem; line-height: 1.6;">
+              <li>At least one passenger on this reservation slip must carry an original valid Government Photo ID.</li>
+              <li>This digital E-Ticket Slip (ERS) is recognized on mobile devices without physical paper printing.</li>
+              <li>RailConnect Cancellation Policy: &gt;48 hrs: 90% refund, 12-48 hrs: 50% refund, &lt;12 hrs: 0% refund.</li>
             </ul>
           </div>
         </div>
+
       </div>
     </div>
   </div>
