@@ -323,6 +323,83 @@ h1, h2, h3, h4, h5, h6 {
   transform: rotate(180deg);
 }
 
+/* Station Autocomplete Dropdown */
+.rc-autocomplete-wrapper {
+  position: relative;
+}
+
+.rc-autocomplete-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: var(--rc-radius-md);
+  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.18), 0 4px 10px -2px rgba(15, 23, 42, 0.08);
+  max-height: 270px;
+  overflow-y: auto;
+  z-index: 1060;
+  display: none;
+  padding: 0.35rem 0;
+}
+
+.rc-autocomplete-menu.show {
+  display: block;
+}
+
+.rc-autocomplete-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.9rem;
+  cursor: pointer;
+  border-bottom: 1px solid #F1F5F9;
+  transition: background-color 0.12s ease;
+}
+
+.rc-autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.rc-autocomplete-item:hover,
+.rc-autocomplete-item.active {
+  background-color: var(--rc-orange-subtle);
+}
+
+.rc-autocomplete-item .station-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 0.5rem;
+}
+
+.rc-autocomplete-item .station-name {
+  font-weight: 600;
+  color: var(--rc-text-main);
+  font-size: 0.92rem;
+  line-height: 1.25;
+}
+
+.rc-autocomplete-item .station-city {
+  font-size: 0.75rem;
+  color: var(--rc-text-muted);
+  margin-top: 2px;
+}
+
+.rc-autocomplete-item .station-code-badge {
+  background: var(--rc-navy-primary);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--rc-radius-sm);
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
 /* ==========================================================================
    Hero Section
    ========================================================================== */

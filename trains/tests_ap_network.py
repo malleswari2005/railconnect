@@ -168,3 +168,108 @@ class APNetworkDataTestCase(TestCase):
                 len(matching_trains), 0,
                 f"No trains found for {label} ({from_code} -> {to_code}) on {date_str}"
             )
+
+    def test_station_lookup_variations(self):
+        """Verify searching with 'Vijayawada', 'Vijaywada', 'Tirupathi', 'vizag', and 'BZA' resolves correctly."""
+        today = date.today()
+        next_mon = today + timedelta(days=((0 - today.weekday()) % 7 or 7))
+        date_str = next_mon.isoformat()
+
+        # 1. 'Vijayawada' to 'Tirupathi'
+        resp1 = self.client.get(reverse('trains:search'), {
+            'from_station': 'Vijayawada',
+            'to_station': 'Tirupathi',
+            'journey_date': date_str,
+        })
+        self.assertEqual(resp1.status_code, 200)
+        self.assertEqual(resp1.context['from_station'].code, 'BZA')
+        self.assertEqual(resp1.context['to_station'].code, 'TPTY')
+        self.assertGreater(len(resp1.context['matching_trains']), 0)
+
+        # 2. 'Vijaywada' (misspelling) to 'TPTY'
+        resp2 = self.client.get(reverse('trains:search'), {
+            'from_station': 'Vijaywada',
+            'to_station': 'TPTY',
+            'journey_date': date_str,
+        })
+        self.assertEqual(resp2.status_code, 200)
+        self.assertEqual(resp2.context['from_station'].code, 'BZA')
+        self.assertEqual(resp2.context['to_station'].code, 'TPTY')
+
+        # 3. 'vizag' (alias) to 'BZA'
+        resp3 = self.client.get(reverse('trains:search'), {
+            'from_station': 'vizag',
+            'to_station': 'BZA',
+            'journey_date': date_str,
+        })
+        self.assertEqual(resp3.status_code, 200)
+        self.assertEqual(resp3.context['from_station'].code, 'VSKP')
+        self.assertEqual(resp3.context['to_station'].code, 'BZA')
+
+        # 4. Standard codes 'BZA' to 'TPTY'
+        resp4 = self.client.get(reverse('trains:search'), {
+            'from_station': 'BZA',
+            'to_station': 'TPTY',
+            'journey_date': date_str,
+        })
+        self.assertEqual(resp4.status_code, 200)
+        self.assertEqual(resp4.context['from_station'].code, 'BZA')
+        self.assertEqual(resp4.context['to_station'].code, 'TPTY')
+
+        # 5. Formatted 'Vijayawada Jn (BZA)' to 'Tirupati (TPTY)'
+        resp5 = self.client.get(reverse('trains:search'), {
+            'from_station': 'Vijayawada Jn (BZA)',
+            'to_station': 'Tirupati (TPTY)',
+            'journey_date': date_str,
+        })
+        self.assertEqual(resp5.status_code, 200)
+        self.assertEqual(resp5.context['from_station'].code, 'BZA')
+        self.assertEqual(resp5.context['to_station'].code, 'TPTY')
+
+    def test_nonsense_station_name_friendly_suggestion_no_crash(self):
+        """Verify searching with nonsense station name shows friendly suggestion and does not crash."""
+        today = date.today()
+        next_mon = today + timedelta(days=((0 - today.weekday()) % 7 or 7))
+        date_str = next_mon.isoformat()
+
+        # Unrecognized from_station
+        resp = self.client.get(reverse('trains:search'), {
+            'from_station': 'xyznonsense',
+            'to_station': 'TPTY',
+            'journey_date': date_str,
+        }, follow=True)
+        self.assertEqual(resp.status_code, 200)
+        messages_list = list(resp.context['messages'])
+        self.assertTrue(any("We couldn't find a station named 'xyznonsense'" in str(m) for m in messages_list))
+        self.assertFalse(any("Please check the station codes" in str(m) for m in messages_list))
+
+        # Unrecognized to_station
+        resp2 = self.client.get(reverse('trains:search'), {
+            'from_station': 'BZA',
+            'to_station': 'foobarnotexist',
+            'journey_date': date_str,
+        }, follow=True)
+        self.assertEqual(resp2.status_code, 200)
+        messages_list2 = list(resp2.context['messages'])
+        self.assertTrue(any("We couldn't find a station named 'foobarnotexist'" in str(m) for m in messages_list2))
+
+    def test_station_autocomplete_api_endpoint(self):
+        """Verify AJAX autocomplete API matches code, name, city, and aliases."""
+        # 1. Alias query 'vizag'
+        resp_vizag = self.client.get(reverse('trains:api_stations'), {'term': 'vizag'})
+        self.assertEqual(resp_vizag.status_code, 200)
+        data_vizag = resp_vizag.json()
+        codes_vizag = [item['code'] for item in data_vizag]
+        self.assertIn('VSKP', codes_vizag)
+
+        # 2. Misspelling 'Vijaywada'
+        resp_bza = self.client.get(reverse('trains:api_stations'), {'term': 'Vijaywada'})
+        self.assertEqual(resp_bza.status_code, 200)
+        data_bza = resp_bza.json()
+        codes_bza = [item['code'] for item in data_bza]
+        self.assertIn('BZA', codes_bza)
+
+        # 3. All stations pre-fetch
+        resp_all = self.client.get(reverse('trains:api_stations'), {'all': '1'})
+        self.assertEqual(resp_all.status_code, 200)
+        self.assertGreaterEqual(len(resp_all.json()), 30)

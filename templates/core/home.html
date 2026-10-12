@@ -102,15 +102,17 @@
      ========================================================================== -->
 <div class="container mb-5" style="margin-top: -3.8rem; position: relative; z-index: 25;">
   <div class="rc-search-card">
-    <form action="/trains/search/" method="get" class="row g-3 align-items-center">
+    <form action="/trains/search/" method="get" class="row g-3 align-items-center rc-search-form" id="rcMainSearchForm">
       <!-- From Station Field -->
       <div class="col-lg-3 col-md-5">
-        <div class="rc-search-field">
-          <label for="fromStation" class="rc-search-label">
+        <div class="rc-search-field rc-autocomplete-wrapper">
+          <label for="fromStationInput" class="rc-search-label">
             <i class="bi bi-geo-alt-fill text-danger me-1"></i> From Station
           </label>
-          <input type="text" class="rc-search-input" id="fromStation" name="from_station" placeholder="City or Station Code" list="stationsList" required autocomplete="off">
+          <input type="text" class="rc-search-input rc-station-autocomplete" id="fromStationInput" placeholder="City, Station Name or Code" required autocomplete="off" data-target-hidden="fromStation" data-menu="fromStationMenu">
+          <input type="hidden" name="from_station" id="fromStation">
           <span class="small text-muted d-block" style="font-size: 0.75rem;">Departure Origin</span>
+          <div class="rc-autocomplete-menu" id="fromStationMenu"></div>
         </div>
       </div>
 
@@ -123,33 +125,16 @@
 
       <!-- To Station Field -->
       <div class="col-lg-3 col-md-5">
-        <div class="rc-search-field">
-          <label for="toStation" class="rc-search-label">
+        <div class="rc-search-field rc-autocomplete-wrapper">
+          <label for="toStationInput" class="rc-search-label">
             <i class="bi bi-geo-fill text-success me-1"></i> To Station
           </label>
-          <input type="text" class="rc-search-input" id="toStation" name="to_station" placeholder="City or Station Code" list="stationsList" required autocomplete="off">
+          <input type="text" class="rc-search-input rc-station-autocomplete" id="toStationInput" placeholder="City, Station Name or Code" required autocomplete="off" data-target-hidden="toStation" data-menu="toStationMenu">
+          <input type="hidden" name="to_station" id="toStation">
           <span class="small text-muted d-block" style="font-size: 0.75rem;">Arrival Destination</span>
+          <div class="rc-autocomplete-menu" id="toStationMenu"></div>
         </div>
       </div>
-
-      <!-- Station Datalist (Autocomplete Suggestions) -->
-      <datalist id="stationsList">
-        <option value="NDLS">New Delhi (NDLS)</option>
-        <option value="MMCT">Mumbai Central (MMCT)</option>
-        <option value="HWH">Howrah Junction (HWH)</option>
-        <option value="SBC">KSR Bengaluru (SBC)</option>
-        <option value="MAS">Chennai Central (MAS)</option>
-        <option value="ADI">Ahmedabad Junction (ADI)</option>
-        <option value="CNB">Kanpur Central (CNB)</option>
-        <option value="PNBE">Patna Junction (PNBE)</option>
-        <option value="PUNE">Pune Junction (PUNE)</option>
-        <option value="HYB">Hyderabad Deccan (HYB)</option>
-        <option value="JAT">Jammu Tawi (JAT)</option>
-        <option value="BSB">Varanasi Junction (BSB)</option>
-        <option value="BPL">Bhopal Junction (BPL)</option>
-        <option value="GKP">Gorakhpur Junction (GKP)</option>
-        <option value="CDG">Chandigarh Junction (CDG)</option>
-      </datalist>
 
       <!-- Date Field -->
       <div class="col-lg-3 col-md-6">

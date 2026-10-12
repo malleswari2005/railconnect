@@ -5,15 +5,141 @@ from django.db.models import Q
 from datetime import datetime, date, timedelta, time
 from .models import Station, Train, TrainStop, TrainClass
 
+import re
+import difflib
+
+STATION_ALIAS_MAP = {
+    'VIJAYWADA': 'BZA',
+    'VIJAYAWADA': 'BZA',
+    'BEZWADA': 'BZA',
+    'TIRUPATHI': 'TPTY',
+    'TIRUPATI': 'TPTY',
+    'VIZAG': 'VSKP',
+    'VISAKHAPATNAM': 'VSKP',
+    'VISHAKHAPATNAM': 'VSKP',
+    'VISAKHA': 'VSKP',
+    'BANGLORE': 'SBC',
+    'BANGALORE': 'SBC',
+    'BENGALURU': 'SBC',
+    'CHENNAI': 'MAS',
+    'MADRAS': 'MAS',
+    'HYDERABAD': 'SC',
+    'SECUNDERABAD': 'SC',
+    'KURNOOL': 'KRNT',
+    'CUDDAPAH': 'HX',
+    'KADAPA': 'HX',
+}
+
+def get_station_suggestions(query_str):
+    """Returns up to 3 closest matching station names/codes using difflib."""
+    if not query_str:
+        return []
+    raw = query_str.strip()
+    all_stations = list(Station.objects.all())
+    
+    name_map = {}
+    candidate_keys = []
+    
+    for s in all_stations:
+        for key in (s.name, s.code, s.city, f"{s.name} ({s.code})"):
+            candidate_keys.append(key)
+            name_map[key.lower()] = s
+            
+    for alias, code in STATION_ALIAS_MAP.items():
+        title_alias = alias.title()
+        candidate_keys.append(title_alias)
+        st = next((s for s in all_stations if s.code == code), None)
+        if st:
+            name_map[title_alias.lower()] = st
+
+    matches = difflib.get_close_matches(raw, candidate_keys, n=6, cutoff=0.35)
+    suggestions = []
+    seen = set()
+    for m in matches:
+        st = name_map.get(m.lower())
+        if st and st.code not in seen:
+            seen.add(st.code)
+            suggestions.append(f"{st.name} ({st.code})")
+            if len(suggestions) >= 3:
+                break
+    return suggestions
+
 def get_station_by_query(query_str):
-    """Finds Station by code or case-insensitive name."""
+    """
+    Resolves a Station from various inputs case-insensitively:
+    - Station code (e.g. 'BZA', 'bza')
+    - Exact name (e.g. 'Vijayawada Jn')
+    - 'Name (CODE)' format (e.g. 'Vijayawada (BZA)', 'Vijayawada Jn (BZA)')
+    - Partial name (e.g. 'Vijayawada', 'Tirupati')
+    - Alias map / common alternate spellings (e.g. 'Vizag', 'Bangalore', 'Tirupathi')
+    """
     if not query_str:
         return None
-    query_str = query_str.strip().upper()
-    station = Station.objects.filter(code=query_str).first()
-    if not station:
-        station = Station.objects.filter(name__icontains=query_str).first()
-    return station
+    raw = query_str.strip()
+    if not raw:
+        return None
+
+    # 1. If 'Name (CODE)' format, extract code inside parentheses
+    code_match = re.search(r'\(([A-Za-z0-9]{2,10})\)', raw)
+    if code_match:
+        code_inside = code_match.group(1).upper()
+        station = Station.objects.filter(code=code_inside).first()
+        if station:
+            return station
+        raw = re.sub(r'\s*\([A-Za-z0-9]+\)\s*', ' ', raw).strip()
+
+    cleaned = raw.upper()
+
+    # 2. Direct station code (case-insensitive)
+    station = Station.objects.filter(code=cleaned).first()
+    if station:
+        return station
+
+    # 3. Alias map lookup (direct and alpha-only normalized)
+    norm_key = re.sub(r'[^A-Z0-9]', '', cleaned)
+    if norm_key in STATION_ALIAS_MAP:
+        station = Station.objects.filter(code=STATION_ALIAS_MAP[norm_key]).first()
+        if station:
+            return station
+
+    for word in re.findall(r'[A-Za-z]+', cleaned):
+        if word in STATION_ALIAS_MAP:
+            station = Station.objects.filter(code=STATION_ALIAS_MAP[word]).first()
+            if station:
+                return station
+
+    # 4. Exact name match (case-insensitive)
+    station = Station.objects.filter(name__iexact=raw).first()
+    if station:
+        return station
+
+    # 5. Exact city match
+    station = Station.objects.filter(city__iexact=raw).first()
+    if station:
+        return station
+
+    # 6. Substring match on name or city
+    station = Station.objects.filter(Q(name__icontains=raw) | Q(city__icontains=raw)).first()
+    if station:
+        return station
+
+    # 7. Prefix match
+    station = Station.objects.filter(name__istartswith=raw).first()
+    if station:
+        return station
+
+    # 8. Suffix-stripped match ("Jn", "Junction", "City", "Cantt", "Central")
+    stem = re.sub(r'\b(JN|JUNCTION|CITY|CANTT|CENTRAL|ROAD|TERMINUS)\b', '', cleaned).strip()
+    if stem and stem != cleaned:
+        station = Station.objects.filter(Q(name__icontains=stem) | Q(city__icontains=stem)).first()
+        if station:
+            return station
+        if stem in STATION_ALIAS_MAP:
+            station = Station.objects.filter(code=STATION_ALIAS_MAP[stem]).first()
+            if station:
+                return station
+
+    return None
 
 def train_search_view(request):
     """Searches trains between two stations on a journey date with intermediate stop support."""
@@ -43,7 +169,18 @@ def train_search_view(request):
     to_station = get_station_by_query(to_query)
 
     if not from_station or not to_station:
-        messages.error(request, f"Could not find one or both stations: '{from_query}', '{to_query}'. Please check the station codes.")
+        if not from_station:
+            suggs = get_station_suggestions(from_query)
+            if suggs:
+                messages.error(request, f"We couldn't find a station named '{from_query}'. Did you mean: {', '.join(suggs)}?")
+            else:
+                messages.error(request, f"We couldn't find a station named '{from_query}'.")
+        if not to_station:
+            suggs = get_station_suggestions(to_query)
+            if suggs:
+                messages.error(request, f"We couldn't find a station named '{to_query}'. Did you mean: {', '.join(suggs)}?")
+            else:
+                messages.error(request, f"We couldn't find a station named '{to_query}'.")
         return redirect('core:home')
 
     if from_station == to_station:
@@ -168,14 +305,45 @@ def live_status_view(request):
     })
 
 def station_autocomplete_view(request):
-    """AJAX JSON search for station dropdown autocomplete."""
+    """AJAX JSON search for station dropdown autocomplete matching code, name, city, and aliases."""
     term = request.GET.get('term', '').strip()
-    if len(term) < 1:
-        return JsonResponse([], safe=False)
+    get_all = request.GET.get('all', '').strip()
+
+    if get_all or len(term) < 1:
+        stations = Station.objects.all().order_by('name')
+        if not get_all:
+            stations = stations[:15]
+        results = [
+            {
+                'code': s.code,
+                'name': s.name,
+                'city': s.city,
+                'label': f"{s.name} ({s.code})",
+                'value': s.code,
+            }
+            for s in stations
+        ]
+        return JsonResponse(results, safe=False)
+
+    term_upper = term.upper()
+    matching_station_codes = set()
+
+    for alias, code in STATION_ALIAS_MAP.items():
+        if term_upper in alias or alias in term_upper:
+            matching_station_codes.add(code)
 
     stations = Station.objects.filter(
-        Q(code__icontains=term) | Q(name__icontains=term) | Q(city__icontains=term)
-    )[:10]
+        Q(code__icontains=term) | Q(name__icontains=term) | Q(city__icontains=term) | Q(code__in=matching_station_codes)
+    ).distinct().order_by('name')[:15]
 
-    results = [{'code': s.code, 'name': s.name, 'city': s.city, 'label': f"{s.name} ({s.code})"} for s in stations]
+    results = [
+        {
+            'code': s.code,
+            'name': s.name,
+            'city': s.city,
+            'label': f"{s.name} ({s.code})",
+            'value': s.code,
+        }
+        for s in stations
+    ]
     return JsonResponse(results, safe=False)

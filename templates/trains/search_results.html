@@ -38,14 +38,22 @@
     <!-- Collapsible Modify Search Bar -->
     <div class="collapse mt-3" id="modifySearchBox">
       <div class="card card-body bg-white text-dark shadow-sm border-0 rounded-3 p-3">
-        <form action="{% url 'trains:search' %}" method="get" class="row g-2 align-items-end">
+        <form action="{% url 'trains:search' %}" method="get" class="row g-2 align-items-end rc-search-form" id="rcModifySearchForm">
           <div class="col-md-3">
             <label class="form-label small fw-semibold text-muted mb-1">From Station</label>
-            <input type="text" name="from_station" class="form-control form-control-sm" value="{{ from_station.code }}" required>
+            <div class="rc-autocomplete-wrapper position-relative">
+              <input type="text" id="modifyFromStationInput" class="form-control form-control-sm rc-station-autocomplete" value="{{ from_station.name }} ({{ from_station.code }})" placeholder="Station name or code" required autocomplete="off" data-target-hidden="modifyFromStation" data-menu="modifyFromStationMenu">
+              <input type="hidden" name="from_station" id="modifyFromStation" value="{{ from_station.code }}">
+              <div class="rc-autocomplete-menu" id="modifyFromStationMenu"></div>
+            </div>
           </div>
           <div class="col-md-3">
             <label class="form-label small fw-semibold text-muted mb-1">To Station</label>
-            <input type="text" name="to_station" class="form-control form-control-sm" value="{{ to_station.code }}" required>
+            <div class="rc-autocomplete-wrapper position-relative">
+              <input type="text" id="modifyToStationInput" class="form-control form-control-sm rc-station-autocomplete" value="{{ to_station.name }} ({{ to_station.code }})" placeholder="Station name or code" required autocomplete="off" data-target-hidden="modifyToStation" data-menu="modifyToStationMenu">
+              <input type="hidden" name="to_station" id="modifyToStation" value="{{ to_station.code }}">
+              <div class="rc-autocomplete-menu" id="modifyToStationMenu"></div>
+            </div>
           </div>
           <div class="col-md-3">
             <label class="form-label small fw-semibold text-muted mb-1">Travel Date</label>
