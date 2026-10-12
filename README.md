@@ -3,10 +3,13 @@
 [![Django](https://img.shields.io/badge/Django-6.0-092e20.svg?logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![Python](https://img.shields.io/badge/Python-3.14-3776ab.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-23%20Passed%20(100%25)-success.svg)](#-automated-testing)
+[![Tests](https://img.shields.io/badge/Tests-30%20Passed%20(100%25)-success.svg)](#-automated-testing)
 [![Offline](https://img.shields.io/badge/Offline-100%25%20Self--Contained-orange.svg)](#-offline-readiness)
 
-An educational, enterprise-grade Django web application inspired by the **Indian Railway Catering and Tourism Corporation (IRCTC)** reservation architecture. Built for an MCA 5-member college capstone project, demonstrating concurrency safety, database normalization, automated waitlist promotion, and offline viva presentation resilience.
+An enterprise-grade Django web application inspired by the **Indian Railway Catering and Tourism Corporation (IRCTC)** reservation architecture, featuring a realistic **Andhra Pradesh-focused railway network** (30+ stations, 36 fictional trains, 7 trunk/intercity corridors). Built to demonstrate high-concurrency seat locking, database normalization, automated waitlist promotion, and offline resilience.
+
+> **Notice on Timetables & Train Data**:
+> Train numbers (fictional 9xxxx series), train names, halt timings, fare calculations, and seat availability represented in this project are sample data generated for demonstration purposes and are **not** real Indian Railways or IRCTC schedules.
 
 ---
 
@@ -125,7 +128,7 @@ Visit `http://127.0.0.1:8000/` in your browser.
 
 ## 🧪 Automated Testing
 
-RailConnect comes with a comprehensive test suite of **23 automated tests** covering authentication, search validation, concurrency locks, double booking prevention, tiered cancellations, waitlist FIFO shifts, and staff access controls:
+RailConnect comes with a comprehensive test suite of **30 automated tests** covering authentication, search validation, concurrency locks, double booking prevention, tiered cancellations, waitlist FIFO shifts, staff access controls, and AP network stop chronology, distance monotonicity, tariff calculation, and search validation:
 
 ```bash
 python manage.py test
@@ -134,9 +137,9 @@ python manage.py test
 Expected output:
 ```text
 Creating test database for alias 'default'...
-.......................
+..............................
 ----------------------------------------------------------------------
-Ran 23 tests in ~29s
+Ran 30 tests in ~35s
 
 OK
 Destroying test database for alias 'default'...
