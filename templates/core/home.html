@@ -1,82 +1,180 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Book Train Tickets – RailConnect Smart Railway Reservation{% endblock %}
+{% block title %}RailConnect – Book Train Tickets, Check PNR & Schedules Online{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="rc-hero-section">
-  <div class="container text-center py-4">
-    <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-1 rounded-pill mb-3">
-      <span class="rc-orange-badge">New</span>
-      <span class="small text-white">Next-Generation IRCTC-Style Educational Engine</span>
+<!-- ==========================================================================
+     Hero Section with Inline SVG Railway Illustration
+     ========================================================================== -->
+<section class="rc-hero-wrapper pb-5">
+  <div class="container position-relative" style="z-index: 5;">
+    <div class="row align-items-center g-4 py-2">
+      <div class="col-lg-7 text-center text-lg-start">
+        <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-10 px-3 py-1 rounded-pill mb-3 border border-white border-opacity-15">
+          <span class="badge bg-warning text-dark fw-bold">NEW</span>
+          <span class="small text-white opacity-90 fw-medium">Next-Generation Express Reservation System</span>
+        </div>
+        <h1 class="display-4 fw-extrabold text-white mb-3" style="letter-spacing: -0.03em;">
+          Fast, Reliable Railway Bookings Nationwide
+        </h1>
+        <p class="lead text-light opacity-80 mb-4" style="max-width: 580px; line-height: 1.6;">
+          Real-time berth allocations, guaranteed atomic seat reservations, instant PNR tracking, and frictionless vector e-ticket downloads.
+        </p>
+
+        <!-- Quick Trust Metrics -->
+        <div class="d-flex flex-wrap gap-4 text-white opacity-90 small pt-2">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-check text-warning fs-5"></i>
+            <span>Zero Double-Booking Guarantee</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-lightning-charge-fill text-warning fs-5"></i>
+            <span>Instant Waitlist Promotion</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-qr-code text-warning fs-5"></i>
+            <span>Digital QR Boarding Passes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modern Inline SVG High-Speed Train Illustration -->
+      <div class="col-lg-5 d-none d-lg-block text-center">
+        <svg width="100%" height="280" viewBox="0 0 500 280" fill="none" xmlns="http://www.w3.org/2000/svg" class="img-fluid" style="filter: drop-shadow(0 15px 30px rgba(0,0,0,0.35));">
+          <!-- Sky / Background Glow -->
+          <circle cx="250" cy="140" r="130" fill="url(#heroGlow)" opacity="0.35" />
+          
+          <!-- Railway Tracks -->
+          <line x1="20" y1="230" x2="480" y2="230" stroke="#64748B" stroke-width="4" stroke-linecap="round" />
+          <line x1="20" y1="245" x2="480" y2="245" stroke="#475569" stroke-width="6" stroke-linecap="round" />
+          <path d="M40 226 L30 249 M90 226 L80 249 M140 226 L130 249 M190 226 L180 249 M240 226 L230 249 M290 226 L280 249 M340 226 L330 249 M390 226 L380 249 M440 226 L430 249" stroke="#94A3B8" stroke-width="3" stroke-linecap="round" />
+
+          <!-- Streamlined Aerodynamic Train Body -->
+          <!-- Rear Carriage -->
+          <rect x="50" y="110" width="130" height="95" rx="10" fill="#1E293B" stroke="#334155" stroke-width="3" />
+          <rect x="65" y="125" width="40" height="30" rx="6" fill="#38BDF8" opacity="0.8" />
+          <rect x="120" y="125" width="40" height="30" rx="6" fill="#38BDF8" opacity="0.8" />
+          <rect x="50" y="175" width="130" height="12" fill="#FF7A18" />
+
+          <!-- Articulated Bellow -->
+          <rect x="180" y="120" width="15" height="80" rx="3" fill="#0F172A" />
+
+          <!-- Locomotive / Engine Body -->
+          <path d="M195 110 L370 110 C420 110 460 145 470 180 L470 205 L195 205 Z" fill="#FFFFFF" />
+          <!-- Aerodynamic Windshield -->
+          <path d="M370 120 L425 120 C445 135 455 155 458 170 L370 170 Z" fill="#0284C7" />
+          <!-- Locomotive Accent Stripe -->
+          <path d="M195 175 L465 175 C460 185 450 195 435 195 L195 195 Z" fill="#FF7A18" />
+          <rect x="220" y="125" width="50" height="30" rx="6" fill="#38BDF8" opacity="0.85" />
+          <rect x="290" y="125" width="50" height="30" rx="6" fill="#38BDF8" opacity="0.85" />
+
+          <!-- High-Intensity Headlight -->
+          <circle cx="462" cy="185" r="7" fill="#FDE047" />
+          <polygon points="469,185 500,165 500,205" fill="#FEF08A" opacity="0.4" />
+
+          <!-- Bogies / Wheels -->
+          <circle cx="90" cy="220" r="14" fill="#0F172A" stroke="#475569" stroke-width="4" />
+          <circle cx="140" cy="220" r="14" fill="#0F172A" stroke="#475569" stroke-width="4" />
+          <circle cx="230" cy="220" r="14" fill="#0F172A" stroke="#475569" stroke-width="4" />
+          <circle cx="280" cy="220" r="14" fill="#0F172A" stroke="#475569" stroke-width="4" />
+          <circle cx="390" cy="220" r="14" fill="#0F172A" stroke="#475569" stroke-width="4" />
+          <circle cx="440" cy="220" r="14" fill="#0F172A" stroke="#475569" stroke-width="4" />
+
+          <!-- Speed Motion Lines -->
+          <line x1="30" y1="90" x2="160" y2="90" stroke="#FF7A18" stroke-width="2" stroke-linecap="round" stroke-dasharray="8 6" opacity="0.7" />
+          <line x1="10" y1="100" x2="120" y2="100" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-dasharray="12 8" opacity="0.6" />
+
+          <defs>
+            <radialGradient id="heroGlow" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0%" stop-color="#38BDF8" />
+              <stop offset="100%" stop-color="#0F2A4E" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+        </svg>
+      </div>
     </div>
-    <h1 class="display-5 fw-bold mb-3">Connecting Destinations with Speed & Precision</h1>
-    <p class="lead opacity-75 mx-auto mb-4" style="max-width: 680px;">
-      Book confirmed seats with instant atomic allocation, fair waitlist promotion, and zero double bookings.
-    </p>
   </div>
-</div>
+</section>
 
-<!-- Booking Search Card -->
-<div class="container mb-5">
-  <div class="rc-hero-card">
-    <form action="/trains/search/" method="get" class="row g-3 align-items-end">
-      <!-- From Station -->
-      <div class="col-lg-3 col-md-6">
-        <label for="fromStation" class="form-label fw-bold text-secondary small text-uppercase mb-1">From Station</label>
-        <div class="input-group">
-          <span class="input-group-text bg-light text-primary">🚉</span>
-          <input type="text" class="form-control form-control-lg fs-6" id="fromStation" name="from_station" placeholder="e.g. NDLS or New Delhi" list="stationsList" required autocomplete="off">
+<!-- ==========================================================================
+     Floating Search Card Component (MakeMyTrip / Booking.com Style)
+     ========================================================================== -->
+<div class="container mb-5" style="margin-top: -3.8rem; position: relative; z-index: 25;">
+  <div class="rc-search-card">
+    <form action="/trains/search/" method="get" class="row g-3 align-items-center">
+      <!-- From Station Field -->
+      <div class="col-lg-3 col-md-5">
+        <div class="rc-search-field">
+          <label for="fromStation" class="rc-search-label">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i> From Station
+          </label>
+          <input type="text" class="rc-search-input" id="fromStation" name="from_station" placeholder="City or Station Code" list="stationsList" required autocomplete="off">
+          <span class="small text-muted d-block" style="font-size: 0.75rem;">Departure Origin</span>
         </div>
       </div>
 
-      <!-- To Station -->
-      <div class="col-lg-3 col-md-6">
-        <label for="toStation" class="form-label fw-bold text-secondary small text-uppercase mb-1">To Station</label>
-        <div class="input-group">
-          <span class="input-group-text bg-light text-primary">🏁</span>
-          <input type="text" class="form-control form-control-lg fs-6" id="toStation" name="to_station" placeholder="e.g. MMCT or Mumbai Central" list="stationsList" required autocomplete="off">
+      <!-- Swap Button -->
+      <div class="col-lg-auto col-md-2 text-center p-0 d-none d-md-block">
+        <button type="button" class="rc-swap-btn" id="rcSwapStationsBtn" title="Swap Origin and Destination" aria-label="Swap Stations">
+          <i class="bi bi-arrow-left-right"></i>
+        </button>
+      </div>
+
+      <!-- To Station Field -->
+      <div class="col-lg-3 col-md-5">
+        <div class="rc-search-field">
+          <label for="toStation" class="rc-search-label">
+            <i class="bi bi-geo-fill text-success me-1"></i> To Station
+          </label>
+          <input type="text" class="rc-search-input" id="toStation" name="to_station" placeholder="City or Station Code" list="stationsList" required autocomplete="off">
+          <span class="small text-muted d-block" style="font-size: 0.75rem;">Arrival Destination</span>
         </div>
       </div>
 
-      <!-- Station Datalist (autocomplete) -->
+      <!-- Station Datalist (Autocomplete Suggestions) -->
       <datalist id="stationsList">
         <option value="NDLS">New Delhi (NDLS)</option>
         <option value="MMCT">Mumbai Central (MMCT)</option>
-        <option value="HWH">Howrah Jn (HWH)</option>
+        <option value="HWH">Howrah Junction (HWH)</option>
         <option value="SBC">KSR Bengaluru (SBC)</option>
         <option value="MAS">Chennai Central (MAS)</option>
-        <option value="ADI">Ahmedabad Jn (ADI)</option>
+        <option value="ADI">Ahmedabad Junction (ADI)</option>
         <option value="CNB">Kanpur Central (CNB)</option>
-        <option value="PNBE">Patna Jn (PNBE)</option>
-        <option value="PUNE">Pune Jn (PUNE)</option>
+        <option value="PNBE">Patna Junction (PNBE)</option>
+        <option value="PUNE">Pune Junction (PUNE)</option>
         <option value="HYB">Hyderabad Deccan (HYB)</option>
         <option value="JAT">Jammu Tawi (JAT)</option>
-        <option value="BSB">Varanasi Jn (BSB)</option>
-        <option value="BPL">Bhopal Jn (BPL)</option>
-        <option value="GKP">Gorakhpur Jn (GKP)</option>
-        <option value="CDG">Chandigarh (CDG)</option>
+        <option value="BSB">Varanasi Junction (BSB)</option>
+        <option value="BPL">Bhopal Junction (BPL)</option>
+        <option value="GKP">Gorakhpur Junction (GKP)</option>
+        <option value="CDG">Chandigarh Junction (CDG)</option>
       </datalist>
 
-      <!-- Date of Journey -->
+      <!-- Date Field -->
       <div class="col-lg-3 col-md-6">
-        <label for="journeyDate" class="form-label fw-bold text-secondary small text-uppercase mb-1">Date of Journey</label>
-        <input type="date" class="form-control form-control-lg fs-6" id="journeyDate" name="journey_date" value="{{ today }}" min="{{ today }}" max="{{ max_date }}" required>
+        <div class="rc-search-field">
+          <label for="journeyDate" class="rc-search-label">
+            <i class="bi bi-calendar3 text-primary me-1"></i> Departure Date
+          </label>
+          <input type="date" class="rc-search-input" id="journeyDate" name="journey_date" value="{{ today }}" min="{{ today }}" max="{{ max_date }}" required>
+          <span class="small text-muted d-block" style="font-size: 0.75rem;">Up to 120 days advance</span>
+        </div>
       </div>
 
-      <!-- Search Button -->
-      <div class="col-lg-3 col-md-6">
-        <button type="submit" class="btn btn-rc-orange btn-lg w-100 fs-6 py-2">
-          🔍 Find Trains
+      <!-- Search CTA Button -->
+      <div class="col-lg-auto col-md-6 flex-grow-1">
+        <button type="submit" class="btn btn-rc-orange w-100 py-3 fs-5 fw-bold shadow-sm" style="height: 100%; min-height: 70px;">
+          <i class="bi bi-search me-2"></i> Find Trains
         </button>
       </div>
     </form>
 
-    <!-- Popular Quick Searches -->
+    <!-- Popular Routes Strip -->
     <div class="mt-4 pt-3 border-top d-flex flex-wrap align-items-center gap-2">
-      <span class="small fw-semibold text-muted me-2">Popular Routes:</span>
+      <span class="small fw-bold text-muted me-2"><i class="bi bi-fire text-danger me-1"></i> Popular Routes:</span>
       {% for route in popular_routes %}
-        <a href="/trains/search/?from_station={{ route.from_code }}&to_station={{ route.to_code }}&journey_date={{ today }}" class="badge text-bg-light border text-decoration-none px-2 py-1 text-dark">
+        <a href="/trains/search/?from_station={{ route.from_code }}&to_station={{ route.to_code }}&journey_date={{ today }}" class="badge text-bg-light border text-decoration-none px-3 py-2 text-dark rounded-pill fw-medium rc-card-hover">
           {{ route.from_name }} &rarr; {{ route.to_name }}
         </a>
       {% endfor %}
@@ -84,69 +182,147 @@
   </div>
 </div>
 
-<!-- Educational Viva & Demo Fast-Track Card -->
-<div class="container mb-5">
-  <div class="card border-warning bg-warning bg-opacity-10 shadow-sm">
-    <div class="card-body p-4">
-      <div class="row align-items-center g-3">
-        <div class="col-lg-8">
-          <h5 class="fw-bold text-dark mb-1">🎓 Viva Examiner / Demo Quick-Start Credentials</h5>
-          <p class="small text-secondary mb-0">
-            For academic viva evaluation, demo accounts are pre-seeded with existing bookings, transaction histories, and staff access:
-          </p>
-          <div class="d-flex flex-wrap gap-3 mt-2 small font-monospace">
-            <div><span class="badge bg-dark">Staff Admin:</span> <code>staff_admin</code> / <code>AdminPass@123</code></div>
-            <div><span class="badge bg-primary">Demo Passenger:</span> <code>passenger1</code> / <code>Pass@123</code></div>
-            <div><span class="badge bg-secondary">Second User:</span> <code>passenger2</code> / <code>Pass@123</code></div>
-          </div>
-        </div>
-        <div class="col-lg-4 text-lg-end">
-          <a href="/accounts/login/" class="btn btn-outline-dark btn-sm me-2">Log In</a>
-          <a href="/accounts/register/" class="btn btn-rc-orange btn-sm">Create New Account</a>
-        </div>
-      </div>
-    </div>
+<!-- ==========================================================================
+     Key Value Proposition – Why Book with RailConnect
+     ========================================================================== -->
+<section class="container py-4 mb-5">
+  <div class="text-center mb-5">
+    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold mb-2">EXPERIENCE THE ADVANTAGE</span>
+    <h2 class="h2 fw-bold text-dark">Why Millions Choose RailConnect</h2>
+    <p class="text-muted mx-auto" style="max-width: 600px;">
+      State-of-the-art reservation engineering designed for lightning speed, zero booking collisions, and reliable refunds.
+    </p>
   </div>
-</div>
 
-<!-- Architecture & Feature Highlights -->
-<div class="container mb-5">
   <div class="row g-4">
-    <div class="col-md-4">
-      <div class="rc-card p-4 h-100">
-        <div class="rounded-3 bg-primary bg-opacity-10 p-3 d-inline-block text-primary mb-3">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+    <div class="col-lg-3 col-md-6">
+      <div class="rc-card p-4 h-100 rc-card-hover border-top border-4 border-primary">
+        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-3 p-3 mb-3 fs-3">
+          <i class="bi bi-shield-lock-fill"></i>
         </div>
-        <h5 class="fw-bold">Concurrency-Safe Engine</h5>
-        <p class="text-secondary small mb-0">
-          Uses database row locking (<code>select_for_update()</code>) inside <code>transaction.atomic</code> blocks. Eliminates race conditions and prevents double-booking berths.
+        <h5 class="h6 fw-bold text-dark mb-2">Atomic Seat Allocation</h5>
+        <p class="small text-muted mb-0">
+          Advanced row-level transaction locks eliminate race conditions. Guaranteed zero double-bookings even during high-demand rush windows.
         </p>
       </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="rc-card p-4 h-100">
-        <div class="rounded-3 bg-warning bg-opacity-10 p-3 d-inline-block text-warning mb-3">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+    <div class="col-lg-3 col-md-6">
+      <div class="rc-card p-4 h-100 rc-card-hover border-top border-4 border-warning">
+        <div class="d-inline-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning rounded-3 p-3 mb-3 fs-3">
+          <i class="bi bi-arrow-repeat"></i>
         </div>
-        <h5 class="fw-bold">Fair Waitlist Promotion</h5>
-        <p class="text-secondary small mb-0">
-          When any passenger cancels a confirmed berth, the earliest waitlisted passenger is automatically promoted to confirmed with automated queue renumbering.
+        <h5 class="h6 fw-bold text-dark mb-2">Automated Waitlist Promotion</h5>
+        <p class="small text-muted mb-0">
+          When any passenger cancels a confirmed berth, our FIFO queue engine immediately upgrades waitlisted tickets with automatic seat reassignments.
         </p>
       </div>
     </div>
 
-    <div class="col-md-4">
-      <div class="rc-card p-4 h-100">
-        <div class="rounded-3 bg-success bg-opacity-10 p-3 d-inline-block text-success mb-3">
-          <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+    <div class="col-lg-3 col-md-6">
+      <div class="rc-card p-4 h-100 rc-card-hover border-top border-4 border-success">
+        <div class="d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-3 p-3 mb-3 fs-3">
+          <i class="bi bi-cash-stack"></i>
         </div>
-        <h5 class="fw-bold">Instant E-Ticket & QR</h5>
-        <p class="text-secondary small mb-0">
-          Generates professional downloadable PDF tickets powered by ReportLab with embedded QR codes for instant offline ticket verification.
+        <h5 class="h6 fw-bold text-dark mb-2">Rule-Based Instant Refunds</h5>
+        <p class="small text-muted mb-0">
+          Crystal-clear cancellation tiers: 90% refund >48 hours, 50% between 12-48 hours. Transparent policies with zero hidden surcharges.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+      <div class="rc-card p-4 h-100 rc-card-hover border-top border-4 border-info">
+        <div class="d-inline-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info rounded-3 p-3 mb-3 fs-3">
+          <i class="bi bi-file-earmark-pdf-fill"></i>
+        </div>
+        <h5 class="h6 fw-bold text-dark mb-2">Vector PDF & QR Boarding Passes</h5>
+        <p class="small text-muted mb-0">
+          Instant high-resolution vector PDF tickets with embedded scannable QR verification codes, accessible offline on any mobile device.
         </p>
       </div>
     </div>
   </div>
-</div>
+</section>
+
+<!-- ==========================================================================
+     How Booking Works – 4 Simple Steps
+     ========================================================================== -->
+<section class="bg-white py-5 border-top border-bottom mb-5">
+  <div class="container py-3">
+    <div class="text-center mb-5">
+      <span class="badge bg-warning bg-opacity-10 text-warning px-3 py-2 rounded-pill fw-bold mb-2">EASY 4-STEP BOOKING</span>
+      <h2 class="h2 fw-bold text-dark">How RailConnect Works</h2>
+      <p class="text-muted">Effortless journey reservations from search to digital boarding pass.</p>
+    </div>
+
+    <div class="row g-4 text-center">
+      <div class="col-lg-3 col-md-6">
+        <div class="p-3">
+          <div class="rc-user-avatar mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.3rem;">
+            1
+          </div>
+          <h5 class="h6 fw-bold text-dark mb-2">Search Network</h5>
+          <p class="small text-muted">Enter origin, destination, and travel date to explore direct and multi-stop express trains.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="p-3">
+          <div class="rc-user-avatar mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.3rem;">
+            2
+          </div>
+          <h5 class="h6 fw-bold text-dark mb-2">Select Class & Berth</h5>
+          <p class="small text-muted">Choose your preferred coach class (1A, 2A, 3A, SL, CC) and review real-time availability.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="p-3">
+          <div class="rc-user-avatar mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.3rem;">
+            3
+          </div>
+          <h5 class="h6 fw-bold text-dark mb-2">Secure Checkout</h5>
+          <p class="small text-muted">Complete simulated payment with UPI, cards, or net banking via our test gateway.</p>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="p-3">
+          <div class="rc-user-avatar mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.3rem;">
+            4
+          </div>
+          <h5 class="h6 fw-bold text-dark mb-2">Get Digital E-Ticket</h5>
+          <p class="small text-muted">Receive your 10-digit PNR, digital boarding voucher, and vector PDF slip with QR code.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     Operational Statistics Strip
+     ========================================================================== -->
+<section class="container pb-5 mb-4">
+  <div class="p-4 p-md-5 rounded-4 text-white shadow-lg" style="background: linear-gradient(135deg, var(--rc-navy-dark) 0%, var(--rc-navy-light) 100%);">
+    <div class="row g-4 text-center align-items-center">
+      <div class="col-md-3 col-6 border-end border-white border-opacity-15">
+        <div class="display-6 fw-extrabold text-warning mb-1">15+</div>
+        <div class="small text-light opacity-75">Major Hubs Connected</div>
+      </div>
+      <div class="col-md-3 col-6 border-end border-white border-opacity-15">
+        <div class="display-6 fw-extrabold text-warning mb-1">100%</div>
+        <div class="small text-light opacity-75">Atomic Concurrency Lock</div>
+      </div>
+      <div class="col-md-3 col-6 border-end border-white border-opacity-15">
+        <div class="display-6 fw-extrabold text-warning mb-1">24/7</div>
+        <div class="small text-light opacity-75">Instant PNR Inquiries</div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="display-6 fw-extrabold text-warning mb-1">90%</div>
+        <div class="small text-light opacity-75">Eligible Refund Tier</div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

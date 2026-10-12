@@ -1,95 +1,111 @@
 {% load static %}
-<div class="demo-badge-bar d-none d-md-block">
-  <div class="container text-center">
-    <span>🎓 <strong>Educational Demo Platform</strong> &bull; Concurrency-Safe Seat Engine &bull; IRCTC-Style Architecture</span>
-  </div>
-</div>
+<header class="sticky-top">
+  <nav class="navbar navbar-expand-lg rc-navbar py-2">
+    <div class="container">
+      <!-- Brand Logo -->
+      <a class="navbar-brand py-1" href="{% url 'core:home' %}">
+        <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-3 p-1 me-1 shadow-sm" style="width: 34px; height: 34px;">
+          <i class="bi bi-train-front-fill fs-5" style="color: var(--rc-orange);"></i>
+        </div>
+        <span class="fw-bold tracking-tight">Rail<span style="color: var(--rc-orange);">Connect</span></span>
+        <span class="brand-badge ms-1">Express</span>
+      </a>
 
-<nav class="navbar navbar-expand-lg rc-navbar sticky-top">
-  <div class="container">
-    <a class="navbar-brand" href="{% url 'core:home' %}">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff7a00" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="4" y="3" width="16" height="16" rx="2"></rect>
-        <path d="M4 11h16"></path>
-        <path d="M12 3v8"></path>
-        <circle cx="8" cy="15" r="1"></circle>
-        <circle cx="16" cy="15" r="1"></circle>
-        <path d="M8 19l-3 3"></path>
-        <path d="M16 19l3 3"></path>
-      </svg>
-      <span>Rail<span style="color: #ff7a00;">Connect</span></span>
-    </a>
+      <!-- Mobile Offcanvas Trigger -->
+      <button class="navbar-toggler border-0 p-1 text-white shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#rcNavOffcanvas" aria-controls="rcNavOffcanvas" aria-label="Toggle navigation">
+        <i class="bi bi-list fs-2"></i>
+      </button>
 
-    <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#rcNavbarContent" aria-controls="rcNavbarContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-    </button>
+      <!-- Desktop Navbar & Mobile Offcanvas Drawer -->
+      <div class="offcanvas offcanvas-end text-bg-dark bg-dark d-lg-flex flex-lg-row align-items-lg-center" tabindex="-1" id="rcNavOffcanvas" aria-labelledby="rcNavOffcanvasLabel">
+        <div class="offcanvas-header border-bottom border-secondary d-lg-none">
+          <h5 class="offcanvas-title text-white fw-bold d-flex align-items-center gap-2" id="rcNavOffcanvasLabel">
+            <i class="bi bi-train-front-fill" style="color: var(--rc-orange);"></i> RailConnect
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
 
-    <div class="collapse navbar-collapse" id="rcNavbarContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">
-            <i class="bi bi-search"></i> Book Journey
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/bookings/pnr-lookup/">
-            <i class="bi bi-ticket-perforated"></i> PNR Status
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/trains/live-status/">
-            <i class="bi bi-broadcast"></i> Live Running Status
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'core:about' %}">
-            <i class="bi bi-info-circle"></i> About System
-          </a>
-        </li>
-      </ul>
-
-      <ul class="navbar-nav ms-auto align-items-lg-center">
-        {% if user.is_authenticated %}
-          {% if user.is_staff %}
-            <li class="nav-item me-2">
-              <a class="btn btn-sm btn-outline-warning text-white fw-bold" href="/dashboard/staff/">
-                🛡️ Staff Dashboard
+        <div class="offcanvas-body d-flex flex-column flex-lg-row justify-content-between p-4 p-lg-0 w-100">
+          <!-- Primary Navigation Links -->
+          <ul class="navbar-nav me-auto mb-3 mb-lg-0 ps-lg-3 gap-lg-1">
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">
+                <i class="bi bi-search"></i> Book Trains
               </a>
             </li>
-          {% endif %}
-          <li class="nav-item me-2">
-            <a class="nav-link" href="/dashboard/my-bookings/">
-              🎫 My Bookings
-            </a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-white fw-bold d-flex align-items-center gap-1" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <div class="bg-warning text-dark rounded-circle d-inline-flex justify-content-center align-items-center me-1" style="width: 28px; height: 28px; font-size: 0.85rem;">
-                {{ user.username|make_list|first|upper }}
-              </div>
-              {{ user.username }}
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
-              <li><a class="dropdown-item" href="/accounts/profile/">👤 Profile & Settings</a></li>
-              <li><a class="dropdown-item" href="/accounts/password-change/">🔑 Change Password</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li>
-                <form method="post" action="/accounts/logout/" class="d-inline">
-                  {% csrf_token %}
-                  <button type="submit" class="dropdown-item text-danger">🚪 Logout</button>
-                </form>
+            <li class="nav-item">
+              <a class="nav-link {% if 'pnr-lookup' in request.path %}active{% endif %}" href="/bookings/pnr-lookup/">
+                <i class="bi bi-ticket-perforated"></i> PNR Status
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if 'live-status' in request.path %}active{% endif %}" href="/trains/live-status/">
+                <i class="bi bi-radar"></i> Live Train Status
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'core:about' %}">
+                <i class="bi bi-info-circle"></i> About Us
+              </a>
+            </li>
+          </ul>
+
+          <!-- User Account Navigation -->
+          <ul class="navbar-nav align-items-lg-center gap-2">
+            {% if user.is_authenticated %}
+              {% if user.is_staff %}
+                <li class="nav-item">
+                  <a class="btn btn-sm btn-outline-warning fw-semibold px-3 text-warning border-warning" href="/dashboard/staff/">
+                    <i class="bi bi-shield-lock-fill"></i> Staff Terminal
+                  </a>
+                </li>
+              {% endif %}
+              <li class="nav-item">
+                <a class="nav-link text-white fw-semibold" href="/dashboard/my-bookings/">
+                  <i class="bi bi-wallet2"></i> My Bookings
+                </a>
               </li>
-            </ul>
-          </li>
-        {% else %}
-          <li class="nav-item me-2">
-            <a class="nav-link" href="/accounts/login/">Log In</a>
-          </li>
-          <li class="nav-item">
-            <a class="btn btn-sm btn-rc-orange px-3" href="/accounts/register/">Register</a>
-          </li>
-        {% endif %}
-      </ul>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-white d-flex align-items-center gap-2" href="#" id="userNavDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <div class="rc-user-avatar">
+                    {{ user.username|make_list|first|upper }}
+                  </div>
+                  <span class="fw-semibold">{{ user.username }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 py-2 mt-2" aria-labelledby="userNavDropdown" style="border-radius: var(--rc-radius-md);">
+                  <li class="px-3 py-2 border-bottom">
+                    <div class="fw-bold text-dark">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="small text-muted text-truncate" style="max-width: 180px;">{{ user.email }}</div>
+                  </li>
+                  <li><a class="dropdown-item py-2" href="/accounts/profile/"><i class="bi bi-person me-2 text-primary"></i> Profile & Preferences</a></li>
+                  <li><a class="dropdown-item py-2" href="/dashboard/my-bookings/"><i class="bi bi-ticket-detailed me-2 text-primary"></i> Booking History</a></li>
+                  <li><a class="dropdown-item py-2" href="/accounts/password-change/"><i class="bi bi-key me-2 text-primary"></i> Security & Password</a></li>
+                  <li><hr class="dropdown-divider my-1"></li>
+                  <li>
+                    <form method="post" action="/accounts/logout/" class="d-inline">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item py-2 text-danger fw-semibold">
+                        <i class="bi bi-box-arrow-right me-2"></i> Log Out
+                      </button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link text-white fw-semibold px-3" href="/accounts/login/">
+                  <i class="bi bi-box-arrow-in-right"></i> Log In
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="btn btn-sm btn-rc-orange px-4 py-2" href="/accounts/register/">
+                  Create Account
+                </a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+</header>

@@ -1,22 +1,33 @@
 {% extends 'base.html' %}
 
-{% block title %}404 - Page Not Found | RailConnect{% endblock %}
+{% block title %}404 - Track Not Found | RailConnect{% endblock %}
 
 {% block content %}
-<div class="container py-5 text-center my-5">
+<div class="container py-5 my-5 text-center">
   <div class="row justify-content-center">
-    <div class="col-md-7">
-      <div class="display-1 fw-bold text-danger mb-3">404</div>
-      <h2 class="h3 fw-bold text-dark mb-3">Track Not Found!</h2>
-      <p class="text-muted mb-4 lead">
-        The destination station or page you were trying to reach does not exist or has been rerouted.
+    <div class="col-lg-6 col-md-8">
+      <!-- Railway Signal SVG Illustration -->
+      <div class="mb-4">
+        <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#FF7A18" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="mx-auto">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+        </svg>
+      </div>
+
+      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 mb-3 fw-bold fs-6">
+        Error 404
+      </span>
+      <h1 class="h2 fw-bold text-dark mb-3">Track Not Found!</h1>
+      <p class="text-muted lead fs-6 mb-4">
+        The route, schedule, or page you were trying to access does not exist or has been switched to another track.
       </p>
-      <div class="d-flex justify-content-center gap-3">
-        <a href="{% url 'core:home' %}" class="btn btn-rc-primary px-4">
-          🚂 Back to Main Station (Home)
+
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'core:home' %}" class="btn btn-rc-orange px-4 py-2">
+          <i class="bi bi-house-door-fill"></i> Return to Home Station
         </a>
-        <a href="/bookings/pnr-lookup/" class="btn btn-outline-secondary px-4">
-          Check PNR Status
+        <a href="/bookings/pnr-lookup/" class="btn btn-rc-outline-navy px-4 py-2">
+          <i class="bi bi-ticket-perforated"></i> Check PNR Status
         </a>
       </div>
     </div>

@@ -1,47 +1,79 @@
 <footer class="rc-footer">
   <div class="container">
-    <div class="row g-4 mb-4">
+    <div class="row g-4 mb-5">
+      <!-- Col 1: Brand & Mission -->
       <div class="col-lg-4 col-md-6">
-        <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
-          <span>Rail<span style="color: #ff7a00;">Connect</span></span>
-        </h5>
-        <p class="small text-light opacity-75">
-          Educational, high-concurrency Smart Railway Reservation System built with Django.
-          Demonstrates database normalization, atomic transaction locks, waitlist queues, and modern UI engineering.
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-3 p-1 shadow-sm" style="width: 32px; height: 32px;">
+            <i class="bi bi-train-front-fill fs-5" style="color: var(--rc-orange);"></i>
+          </div>
+          <span class="fs-4 fw-bold text-white tracking-tight">Rail<span style="color: var(--rc-orange);">Connect</span></span>
+        </div>
+        <p class="small text-light opacity-75 mb-3 pe-lg-3" style="line-height: 1.6;">
+          Fast, reliable express train ticketing across nationwide corridors. Seamless booking, real-time berth availability, transparent cancellation policies, and instant digital reservation vouchers.
         </p>
-        <span class="badge bg-secondary">MCA Academic Project Demo</span>
+        <div class="d-flex gap-2">
+          <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-10 px-3 py-2">
+            <i class="bi bi-shield-check text-success me-1"></i> 256-Bit SSL Encrypted
+          </span>
+          <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-10 px-3 py-2">
+            <i class="bi bi-clock-history text-warning me-1"></i> 24/7 Monitoring
+          </span>
+        </div>
       </div>
 
-      <div class="col-lg-2 col-md-6">
-        <h6 class="text-white fw-semibold mb-3">Quick Links</h6>
-        <ul class="list-unstyled small mb-0">
-          <li class="mb-2"><a href="{% url 'core:home' %}">Search Trains</a></li>
-          <li class="mb-2"><a href="/bookings/pnr-lookup/">PNR Inquiry</a></li>
-          <li class="mb-2"><a href="/trains/live-status/">Live Status Simulator</a></li>
-          <li class="mb-2"><a href="{% url 'core:about' %}">Project Overview</a></li>
+      <!-- Col 2: Navigation -->
+      <div class="col-lg-2 col-md-6 col-6">
+        <h6>Quick Links</h6>
+        <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
+          <li><a href="{% url 'core:home' %}"><i class="bi bi-chevron-right me-1 small"></i> Book Journey</a></li>
+          <li><a href="/bookings/pnr-lookup/"><i class="bi bi-chevron-right me-1 small"></i> PNR Status</a></li>
+          <li><a href="/trains/live-status/"><i class="bi bi-chevron-right me-1 small"></i> Live Running Status</a></li>
+          <li><a href="{% url 'core:about' %}"><i class="bi bi-chevron-right me-1 small"></i> About RailConnect</a></li>
+          <li><a href="/accounts/login/"><i class="bi bi-chevron-right me-1 small"></i> Passenger Login</a></li>
         </ul>
       </div>
 
-      <div class="col-lg-3 col-md-6">
-        <h6 class="text-white fw-semibold mb-3">Viva Highlights</h6>
-        <ul class="list-unstyled small mb-0 text-light opacity-75">
-          <li class="mb-1">🔒 <strong>Row-level DB Locking</strong>: <code>select_for_update()</code></li>
-          <li class="mb-1">⚡ <strong>Atomic Waitlist Engine</strong>: Auto-promotion</li>
-          <li class="mb-1">💳 <strong>Demo Gateway</strong>: State machine</li>
-          <li class="mb-1">📄 <strong>PDF E-Tickets</strong>: ReportLab vector output</li>
+      <!-- Col 3: Key Features -->
+      <div class="col-lg-3 col-md-6 col-6">
+        <h6>Platform Features</h6>
+        <ul class="list-unstyled small mb-0 d-flex flex-column gap-2 text-light opacity-75">
+          <li><i class="bi bi-lock-fill text-warning me-2"></i> Atomic Concurrency Locking</li>
+          <li><i class="bi bi-arrow-repeat text-success me-2"></i> Automatic Waitlist Promotion</li>
+          <li><i class="bi bi-qr-code text-info me-2"></i> Instant QR Boarding Passes</li>
+          <li><i class="bi bi-file-earmark-pdf text-danger me-2"></i> Vector PDF E-Ticket Download</li>
+          <li><i class="bi bi-speedometer2 text-primary me-2"></i> Low-Latency Route Search</li>
         </ul>
       </div>
 
+      <!-- Col 4: Cancellation Policy -->
       <div class="col-lg-3 col-md-6">
-        <h6 class="text-white fw-semibold mb-3">Refund Policy (Demo)</h6>
-        <p class="small text-light opacity-75 mb-1">&bull; &gt;48 hrs: 90% Refund (10% clerkage)</p>
-        <p class="small text-light opacity-75 mb-1">&bull; 12–48 hrs: 50% Refund</p>
-        <p class="small text-light opacity-75 mb-0">&bull; &lt;12 hrs: Non-refundable</p>
+        <h6>RailConnect Cancellation Policy</h6>
+        <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 small text-light opacity-75">
+          <div class="d-flex justify-content-between mb-1">
+            <span>&gt; 48 hours prior:</span>
+            <strong class="text-success">90% Refund</strong>
+          </div>
+          <div class="d-flex justify-content-between mb-1">
+            <span>12 to 48 hours:</span>
+            <strong class="text-warning">50% Refund</strong>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>&lt; 12 hours:</span>
+            <strong class="text-danger">Non-refundable</strong>
+          </div>
+        </div>
+        <div class="mt-3 small text-muted">
+          Need assistance? Reach us at <a href="mailto:support@railconnect.example" class="text-white text-decoration-underline">support@railconnect.example</a>
+        </div>
       </div>
     </div>
 
-    <div class="border-top border-secondary pt-3 text-center small text-light opacity-50">
-      &copy; {{ CURRENT_YEAR }} RailConnect MCA Project Team. Built for academic demonstration & educational use.
+    <!-- Official Disclaimer Bar -->
+    <div class="border-top border-white border-opacity-10 pt-4 text-center small text-light opacity-75">
+      <p class="mb-1">
+        RailConnect is an independent booking platform and is not affiliated with Indian Railways or IRCTC. &copy; 2026 RailConnect. All rights reserved.
+      </p>
     </div>
   </div>
 </footer>

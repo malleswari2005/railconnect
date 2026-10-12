@@ -5,12 +5,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>{% block title %}RailConnect – Smart Railway Reservation System{% endblock %}</title>
+  <title>{% block title %}RailConnect – Smart Railway Reservations & Express Ticketing{% endblock %}</title>
+
+  <!-- Local Offline Inter Font Bundle -->
+  <link rel="stylesheet" href="{% static 'vendor/fonts/inter.css' %}">
 
   <!-- Local Offline Bootstrap 5.3 CSS -->
   <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
 
-  <!-- Custom Styles -->
+  <!-- Local Offline Bootstrap Icons -->
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
+
+  <!-- Premium Custom Styling System -->
   <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 
   {% block extra_css %}{% endblock %}
@@ -20,21 +26,21 @@
   <!-- Navigation Bar -->
   {% include 'partials/_navbar.html' %}
 
-  <!-- Global Alerts & Messages -->
+  <!-- Toast Alert Notifications -->
   {% include 'partials/_messages.html' %}
 
-  <!-- Main Content -->
+  <!-- Main Application Body -->
   <main>
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Footer -->
+  <!-- Modern Multi-Column Footer -->
   {% include 'partials/_footer.html' %}
 
   <!-- Local Offline Bootstrap 5.3 JS Bundle -->
   <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
 
-  <!-- Custom Client JavaScript -->
+  <!-- RailConnect Client Logic -->
   <script src="{% static 'js/main.js' %}"></script>
 
   {% block extra_js %}{% endblock %}
