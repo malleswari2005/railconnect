@@ -3,71 +3,149 @@
 {% block title %}Timetable & Route for {{ train.train_number }} - {{ train.name }} | RailConnect{% endblock %}
 
 {% block content %}
-<div class="bg-primary text-white py-4 mb-4">
+<div class="rc-search-header-bar py-4 text-white">
   <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
       <div>
-        <span class="badge bg-warning text-dark fw-bold mb-1">{{ train.train_number }}</span>
-        <h2 class="h3 fw-bold mb-0">{{ train.name }}</h2>
-        <div class="small opacity-75 mt-1">
-          Route: {{ train.source_station.name }} ({{ train.source_station.code }}) &rarr; {{ train.destination_station.name }} ({{ train.destination_station.code }}) &bull; {{ train.distance_km }} km &bull; Type: {{ train.get_train_type_display }}
+        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+          <span class="badge bg-warning text-dark fw-bold px-3 py-1 fs-6">{{ train.train_number }}</span>
+          <span class="badge bg-white bg-opacity-25">{{ train.get_train_type_display }}</span>
+          <span class="badge bg-success-subtle text-success border border-success-subtle">Active Service</span>
+        </div>
+        <h1 class="h3 fw-bold mb-1 text-white">{{ train.name }}</h1>
+        <div class="text-white-50 small d-flex align-items-center gap-3 flex-wrap">
+          <span><i class="bi bi-geo-alt-fill text-warning me-1"></i> {{ train.source_station.name }} ({{ train.source_station.code }}) &rarr; {{ train.destination_station.name }} ({{ train.destination_station.code }})</span>
+          <span>&bull;</span>
+          <span><i class="bi bi-speedometer2 text-warning me-1"></i> {{ train.distance_km }} km</span>
         </div>
       </div>
-      <div>
-        <a href="/trains/live-status/?train_number={{ train.train_number }}" class="btn btn-warning text-dark fw-bold btn-sm">
-          📡 Track Live Status
+
+      <div class="d-flex gap-2">
+        <a href="/trains/live-status/?train_number={{ train.train_number }}" class="btn btn-warning text-dark fw-bold btn-sm px-3">
+          <i class="bi bi-radar me-1"></i> Track Live Status
         </a>
+      </div>
+    </div>
+
+    <!-- Running Days Badges -->
+    <div class="mt-3 pt-3 border-top border-white border-opacity-10 d-flex align-items-center gap-2 flex-wrap">
+      <span class="small text-white-50 fw-semibold">Runs on:</span>
+      <div class="d-flex gap-1 flex-wrap">
+        {% for day in "MON,TUE,WED,THU,FRI,SAT,SUN"|make_list %}
+          {# Check if day abbreviation is in runs_on_days #}
+        {% endfor %}
+        <span class="badge bg-white bg-opacity-15 text-white px-2 py-1">{{ train.runs_on_days }}</span>
       </div>
     </div>
   </div>
 </div>
 
-<div class="container pb-5">
-  <div class="rc-card p-4">
-    <h4 class="h5 fw-bold text-dark mb-3">Complete Station Halts & Schedule</h4>
+<div class="container py-4 pb-5">
+  <div class="row g-4">
+    <!-- Schedule Table & Route -->
+    <div class="col-lg-8">
+      <div class="rc-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h5 fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-check text-primary"></i> Station Halts & Schedule
+          </h2>
+          <span class="badge bg-primary-subtle text-primary border">{{ stops|length }} Total Stops</span>
+        </div>
 
-    <div class="table-responsive">
-      <table class="table table-hover align-middle table-bordered mb-0">
-        <thead class="table-light">
-          <tr>
-            <th class="text-center" style="width: 60px;">#</th>
-            <th>Station Code</th>
-            <th>Station Name</th>
-            <th class="text-center">Arrival</th>
-            <th class="text-center">Departure</th>
-            <th class="text-center">Halt</th>
-            <th class="text-center">Distance</th>
-            <th class="text-center">Day</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for stop in stops %}
-            <tr {% if forloop.first or forloop.last %}class="table-active fw-bold"{% endif %}>
-              <td class="text-center">{{ stop.stop_order }}</td>
-              <td><span class="badge bg-dark">{{ stop.station.code }}</span></td>
-              <td>{{ stop.station.name }} <span class="text-muted small">({{ stop.station.city }})</span></td>
-              <td class="text-center">{{ stop.arrival_time|time:"H:i"|default:"Source" }}</td>
-              <td class="text-center">{{ stop.departure_time|time:"H:i"|default:"Destination" }}</td>
-              <td class="text-center">
-                {% if forloop.first or forloop.last %}-{% else %}{{ stop.halt_minutes }} min{% endif %}
-              </td>
-              <td class="text-center">{{ stop.distance_from_source_km }} km</td>
-              <td class="text-center">Day {{ stop.day_offset|add:1 }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr class="small text-uppercase text-muted">
+                <th class="text-center" style="width: 50px;">#</th>
+                <th>Station</th>
+                <th class="text-center">Arrival</th>
+                <th class="text-center">Departure</th>
+                <th class="text-center">Halt</th>
+                <th class="text-center">Distance</th>
+                <th class="text-center">Day</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stop in stops %}
+                <tr {% if forloop.first or forloop.last %}class="table-light fw-bold"{% endif %}>
+                  <td class="text-center text-muted small">{{ stop.stop_order }}</td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-bold">{{ stop.station.code }}</span>
+                      <div>
+                        <div class="text-dark fw-semibold">{{ stop.station.name }}</div>
+                        <div class="small text-muted" style="font-size: 0.75rem;">{{ stop.station.city }}, {{ stop.station.state }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-center">
+                    {% if forloop.first %}
+                      <span class="badge bg-secondary-subtle text-secondary">Origin</span>
+                    {% else %}
+                      <span class="fw-semibold text-dark">{{ stop.arrival_time|time:"H:i" }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    {% if forloop.last %}
+                      <span class="badge bg-secondary-subtle text-secondary">Destination</span>
+                    {% else %}
+                      <span class="fw-semibold text-dark">{{ stop.departure_time|time:"H:i" }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center">
+                    {% if forloop.first or forloop.last %}
+                      <span class="text-muted">-</span>
+                    {% else %}
+                      <span class="badge bg-warning-subtle text-warning-emphasis">{{ stop.halt_minutes }} min</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-center text-muted small">{{ stop.distance_from_source_km }} km</td>
+                  <td class="text-center">
+                    <span class="badge bg-light text-dark border">Day {{ stop.day_offset|add:1 }}</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
-    <!-- Classes configured -->
-    <div class="mt-4 pt-3 border-top">
-      <h5 class="h6 fw-bold text-dark mb-2">Coaches & Classes in Service:</h5>
-      <div class="d-flex flex-wrap gap-2">
-        {% for c in train.classes.all %}
-          <div class="badge bg-light text-dark border p-2">
-            <strong>{{ c.class_code }}</strong> &bull; {{ c.class_name }} ({{ c.total_coaches }} Coaches, {{ c.seats_per_coach }} Berths each)
-          </div>
-        {% endfor %}
+    <!-- Right Column: Classes and Quick Facts -->
+    <div class="col-lg-4">
+      <div class="rc-card p-4 mb-4">
+        <h3 class="h6 fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+          <i class="bi bi-shield-shaded text-primary"></i> Travel Classes Available
+        </h3>
+        <div class="d-flex flex-column gap-2">
+          {% for c in train.classes.all %}
+            <div class="p-3 border rounded-3 bg-light bg-opacity-50">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="badge bg-primary text-white fw-bold fs-6">{{ c.class_code }}</span>
+                <span class="fw-bold text-primary">From ₹{{ c.base_fare }}</span>
+              </div>
+              <div class="fw-semibold text-dark small">{{ c.class_name }}</div>
+              <div class="small text-muted mt-1 d-flex justify-content-between">
+                <span>{{ c.total_coaches }} Coaches</span>
+                <span>{{ c.seats_per_coach }} Berths / Coach</span>
+              </div>
+            </div>
+          {% empty %}
+            <div class="text-muted small">No travel classes configured.</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Quick Action Card -->
+      <div class="rc-card p-4 text-center">
+        <div class="rounded-circle bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">
+          <i class="bi bi-ticket-perforated fs-4"></i>
+        </div>
+        <h3 class="h6 fw-bold text-dark mb-2">Ready to Book?</h3>
+        <p class="small text-muted mb-3">Check dates and reserve seats for this train now.</p>
+        <a href="{% url 'core:home' %}" class="btn btn-rc-primary w-100 fw-bold">
+          Search Seats & Fares
+        </a>
       </div>
     </div>
   </div>
