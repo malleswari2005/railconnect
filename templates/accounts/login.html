@@ -4,62 +4,93 @@
 
 {% block content %}
 <div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-5 col-md-7">
-      <div class="rc-card p-4 p-md-5">
-        <div class="text-center mb-4">
-          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-3 mb-2">
-            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+  <div class="row justify-content-center align-items-stretch g-0 rc-card overflow-hidden shadow-lg mx-auto" style="max-width: 960px;">
+    <!-- Left Column: Branding & Feature Illustration -->
+    <div class="col-lg-5 d-none d-lg-flex flex-column justify-content-between p-5 text-white" style="background: linear-gradient(135deg, #0B1F3A 0%, #12305A 100%);">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-4">
+          <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+            <i class="bi bi-train-front-fill fs-5"></i>
           </div>
-          <h2 class="h4 fw-bold text-dark">Sign In to RailConnect</h2>
-          <p class="text-muted small">Manage your train bookings and digital tickets</p>
+          <span class="fs-4 fw-bold">Rail<span style="color: #FF7A18;">Connect</span></span>
         </div>
+        <h2 class="h3 fw-bold mb-3 text-white">Your Travel Portal</h2>
+        <p class="text-white-50 small leading-relaxed mb-4">
+          Sign in to access real-time berth allocation, instant refund claims, verified e-tickets, and seamless booking history.
+        </p>
 
-        <form method="post" class="prevent-double-submit" novalidate>
-          {% csrf_token %}
-          <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
-
-          {% if form.non_field_errors %}
-            <div class="alert alert-danger small mb-3">
-              {{ form.non_field_errors }}
+        <div class="d-flex flex-column gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-white bg-opacity-10 text-warning d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+              <i class="bi bi-lightning-charge-fill"></i>
             </div>
-          {% endif %}
+            <span class="small text-white">High-speed reservation engine</span>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-white bg-opacity-10 text-warning d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+              <i class="bi bi-shield-check"></i>
+            </div>
+            <span class="small text-white">Atomic seat lock protection</span>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-white bg-opacity-10 text-warning d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+              <i class="bi bi-ticket-perforated"></i>
+            </div>
+            <span class="small text-white">Digital paperless boarding pass</span>
+          </div>
+        </div>
+      </div>
 
-          <div class="mb-3">
-            <label class="form-label fw-semibold small">Username</label>
+      <div class="pt-4 border-top border-white border-opacity-10">
+        <div class="small text-white-50">&copy; 2026 RailConnect Platform</div>
+      </div>
+    </div>
+
+    <!-- Right Column: Login Form -->
+    <div class="col-lg-7 p-4 p-md-5 bg-white d-flex flex-column justify-content-center">
+      <div class="mb-4">
+        <h1 class="h3 fw-bold text-dark mb-1">Sign In</h1>
+        <p class="text-muted small">Enter your credentials to access your RailConnect account</p>
+      </div>
+
+      <form method="post" class="prevent-double-submit" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger small mb-3">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold small text-dark">Username <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-person text-muted"></i></span>
             {{ form.username }}
-            {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors.0 }}</div>{% endif %}
           </div>
+          {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+        </div>
 
-          <div class="mb-3">
-            <label class="form-label fw-semibold small d-flex justify-content-between align-items-center">
-              <span>Password</span>
-            </label>
+        <div class="mb-3">
+          <label class="form-label fw-semibold small text-dark">Password <span class="text-danger">*</span></label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-lock text-muted"></i></span>
             {{ form.password }}
-            {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors.0 }}</div>{% endif %}
           </div>
-
-          <button type="submit" class="btn btn-rc-orange w-100 py-2 fw-bold mt-2">
-            Sign In &rarr;
-          </button>
-        </form>
-
-        <!-- Viva Demo Quick Fill Buttons -->
-        <div class="mt-4 pt-3 border-top">
-          <p class="text-muted small fw-semibold text-center mb-2">Quick Viva Login (Click to fill):</p>
-          <div class="d-grid gap-2">
-            <button type="button" class="btn btn-sm btn-outline-dark text-start py-1" onclick="document.getElementById('id_username').value='staff_admin'; document.getElementById('id_password').value='AdminPass@123';">
-              🛡️ <strong>Staff Admin:</strong> <code>staff_admin</code> / <code>AdminPass@123</code>
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-primary text-start py-1" onclick="document.getElementById('id_username').value='passenger1'; document.getElementById('id_password').value='Pass@123';">
-              🎫 <strong>Passenger:</strong> <code>passenger1</code> / <code>Pass@123</code>
-            </button>
-          </div>
+          {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
         </div>
 
-        <div class="text-center mt-4 pt-2 border-top small">
-          Don't have an account? <a href="{% url 'accounts:register' %}" class="fw-bold text-decoration-none">Register here</a>
-        </div>
+        <button type="submit" class="btn btn-rc-primary w-100 py-2 fw-bold mt-2">
+          Sign In <i class="bi bi-arrow-right ms-1"></i>
+        </button>
+      </form>
+
+      <div class="text-center mt-4 pt-3 border-top small text-muted">
+        Don't have an account yet? 
+        <a href="{% url 'accounts:register' %}" class="fw-bold text-primary text-decoration-none ms-1">
+          Create an account
+        </a>
       </div>
     </div>
   </div>
