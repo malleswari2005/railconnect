@@ -1,0 +1,59 @@
+{# Reusable 4-Step Booking Progress Stepper #}
+<div class="rc-stepper-container mb-4">
+  <div class="d-flex justify-content-between align-items-center position-relative">
+    {# Stepper progress bar line #}
+    <div class="position-absolute top-50 start-0 translate-middle-y w-100" style="height: 3px; background-color: #E2E8F0; z-index: 1;"></div>
+    <div class="position-absolute top-50 start-0 translate-middle-y" 
+         style="height: 3px; background-color: #FF7A18; z-index: 1; transition: width 0.3s ease;
+         {% if active_step == 1 %}width: 0%;{% elif active_step == 2 %}width: 33.3%;{% elif active_step == 3 %}width: 66.6%;{% elif active_step == 4 %}width: 100%;{% endif %}">
+    </div>
+
+    {# Step 1: Passengers #}
+    <div class="rc-step-item text-center position-relative" style="z-index: 2;">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm fw-bold
+        {% if active_step == 1 %}bg-warning text-dark border border-2 border-warning{% elif active_step > 1 %}bg-success text-white{% else %}bg-white text-muted border border-2{% endif %}"
+        style="width: 40px; height: 40px; font-size: 0.9rem;">
+        {% if active_step > 1 %}<i class="bi bi-check-lg"></i>{% else %}1{% endif %}
+      </div>
+      <div class="small fw-semibold mt-1 {% if active_step == 1 %}text-primary fw-bold{% elif active_step > 1 %}text-success{% else %}text-muted{% endif %} d-none d-sm-block">
+        Passengers
+      </div>
+    </div>
+
+    {# Step 2: Review #}
+    <div class="rc-step-item text-center position-relative" style="z-index: 2;">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm fw-bold
+        {% if active_step == 2 %}bg-warning text-dark border border-2 border-warning{% elif active_step > 2 %}bg-success text-white{% else %}bg-white text-muted border border-2{% endif %}"
+        style="width: 40px; height: 40px; font-size: 0.9rem;">
+        {% if active_step > 2 %}<i class="bi bi-check-lg"></i>{% else %}2{% endif %}
+      </div>
+      <div class="small fw-semibold mt-1 {% if active_step == 2 %}text-primary fw-bold{% elif active_step > 2 %}text-success{% else %}text-muted{% endif %} d-none d-sm-block">
+        Review Journey
+      </div>
+    </div>
+
+    {# Step 3: Payment #}
+    <div class="rc-step-item text-center position-relative" style="z-index: 2;">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm fw-bold
+        {% if active_step == 3 %}bg-warning text-dark border border-2 border-warning{% elif active_step > 3 %}bg-success text-white{% else %}bg-white text-muted border border-2{% endif %}"
+        style="width: 40px; height: 40px; font-size: 0.9rem;">
+        {% if active_step > 3 %}<i class="bi bi-check-lg"></i>{% else %}3{% endif %}
+      </div>
+      <div class="small fw-semibold mt-1 {% if active_step == 3 %}text-primary fw-bold{% elif active_step > 3 %}text-success{% else %}text-muted{% endif %} d-none d-sm-block">
+        Payment
+      </div>
+    </div>
+
+    {# Step 4: Ticket #}
+    <div class="rc-step-item text-center position-relative" style="z-index: 2;">
+      <div class="rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm fw-bold
+        {% if active_step == 4 %}bg-success text-white border border-2 border-success{% else %}bg-white text-muted border border-2{% endif %}"
+        style="width: 40px; height: 40px; font-size: 0.9rem;">
+        4
+      </div>
+      <div class="small fw-semibold mt-1 {% if active_step == 4 %}text-success fw-bold{% else %}text-muted{% endif %} d-none d-sm-block">
+        E-Ticket
+      </div>
+    </div>
+  </div>
+</div>

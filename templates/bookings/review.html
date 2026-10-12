@@ -3,63 +3,75 @@
 {% block title %}Review Journey Details – PNR {{ booking.pnr }} | RailConnect{% endblock %}
 
 {% block content %}
-<div class="bg-primary text-white py-4 mb-4">
+<!-- Search Header Bar -->
+<div class="rc-search-header-bar py-3 text-white">
   <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
       <div>
-        <span class="badge bg-warning text-dark fw-bold mb-1">Temporary PNR: {{ booking.pnr }}</span>
-        <h2 class="h3 fw-bold mb-0">Review Journey & Confirm Booking</h2>
-        <div class="small opacity-75 mt-1">
-          Please review passenger details carefully before payment gateway simulation.
+        <div class="small text-white-50 text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Booking Verification</div>
+        <h1 class="h4 fw-bold mb-0 text-white d-flex align-items-center gap-2">
+          <span>Review Journey Details</span>
+          <span class="badge bg-white bg-opacity-25 fs-6">PNR {{ booking.pnr }}</span>
+        </h1>
+        <div class="small text-white-50 mt-1">
+          Please verify passenger details and train schedule carefully before payment.
         </div>
       </div>
       <div>
-        <span class="badge bg-light text-primary fs-5 p-2">
-          Total: ₹{{ booking.total_fare }}
-        </span>
+        <div class="text-end">
+          <div class="small text-white-50">Total Payable</div>
+          <div class="fs-4 fw-bold text-white">₹{{ booking.total_fare }}</div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<div class="container pb-5">
+<div class="container py-4 pb-5">
+  <!-- Progress Stepper -->
+  {% include 'partials/_booking_stepper.html' with active_step=2 %}
+
   <div class="row g-4 justify-content-center">
     <div class="col-lg-9">
       <!-- Train & Route Card -->
       <div class="rc-card p-4 mb-4">
-        <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">Train & Journey Specification</h5>
+        <h2 class="h5 fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+          <i class="bi bi-train-front text-primary"></i> Train & Journey Specification
+        </h2>
         <div class="row g-3">
           <div class="col-md-6">
             <span class="small text-muted d-block">Train Name & Number:</span>
-            <strong>{{ booking.train.train_number }} - {{ booking.train.name }}</strong>
-            <span class="badge bg-secondary ms-1">{{ booking.train.get_train_type_display }}</span>
+            <strong class="text-dark fs-6">{{ booking.train.train_number }} - {{ booking.train.name }}</strong>
+            <span class="badge bg-secondary-subtle text-secondary border ms-1">{{ booking.train.get_train_type_display }}</span>
           </div>
           <div class="col-md-3">
             <span class="small text-muted d-block">Date of Journey:</span>
-            <strong>{{ booking.journey_date|date:"d M Y (D)" }}</strong>
+            <strong class="text-dark">{{ booking.journey_date|date:"d M Y (D)" }}</strong>
           </div>
           <div class="col-md-3">
             <span class="small text-muted d-block">Travel Class:</span>
-            <span class="badge bg-dark fs-6">{{ booking.class_code }}</span>
+            <span class="badge bg-primary text-white fs-6">{{ booking.class_code }}</span>
           </div>
           <div class="col-md-6">
             <span class="small text-muted d-block">Boarding From:</span>
-            <strong>{{ booking.from_station.name }} ({{ booking.from_station.code }})</strong>
+            <strong class="text-dark">{{ booking.from_station.name }} ({{ booking.from_station.code }})</strong>
           </div>
           <div class="col-md-6">
             <span class="small text-muted d-block">Deboarding At:</span>
-            <strong>{{ booking.to_station.name }} ({{ booking.to_station.code }})</strong>
+            <strong class="text-dark">{{ booking.to_station.name }} ({{ booking.to_station.code }})</strong>
           </div>
         </div>
       </div>
 
       <!-- Passengers Card -->
       <div class="rc-card p-4 mb-4">
-        <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">Passenger List</h5>
+        <h2 class="h5 fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+          <i class="bi bi-people text-primary"></i> Passenger List ({{ passengers|length }})
+        </h2>
         <div class="table-responsive">
-          <table class="table table-bordered table-striped mb-0 align-middle">
+          <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
-              <tr>
+              <tr class="small text-muted text-uppercase">
                 <th style="width: 40px;">#</th>
                 <th>Passenger Name</th>
                 <th>Age</th>
@@ -71,12 +83,14 @@
             <tbody>
               {% for p in passengers %}
                 <tr>
-                  <td>{{ forloop.counter }}</td>
-                  <td><strong>{{ p.name }}</strong></td>
+                  <td class="text-muted small">{{ forloop.counter }}</td>
+                  <td><strong class="text-dark">{{ p.name }}</strong></td>
                   <td>{{ p.age }} yrs</td>
                   <td>{{ p.get_gender_display }}</td>
-                  <td>{{ p.get_berth_preference_display }}</td>
-                  <td class="text-end">₹{{ p.fare }}</td>
+                  <td>
+                    <span class="badge bg-light text-dark border">{{ p.get_berth_preference_display|default:"No Preference" }}</span>
+                  </td>
+                  <td class="text-end fw-semibold">₹{{ p.fare }}</td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -92,26 +106,28 @@
 
       <!-- Contact & Notification Summary -->
       <div class="rc-card p-4 mb-4">
-        <h5 class="fw-bold text-primary mb-3 pb-2 border-bottom">Ticket Communication</h5>
+        <h2 class="h5 fw-bold text-dark mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+          <i class="bi bi-bell text-primary"></i> Ticket Communications
+        </h2>
         <div class="row g-3">
           <div class="col-md-6">
             <span class="small text-muted d-block">Email Notification:</span>
-            <strong>{{ booking.contact_email }}</strong>
+            <strong class="text-dark">{{ booking.contact_email }}</strong>
           </div>
           <div class="col-md-6">
             <span class="small text-muted d-block">Mobile SMS Alerts:</span>
-            <strong>{{ booking.contact_phone }}</strong>
+            <strong class="text-dark">{{ booking.contact_phone }}</strong>
           </div>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="d-flex justify-content-between align-items-center">
+      <!-- Action Navigation Buttons -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
         <a href="{% url 'core:home' %}" class="btn btn-outline-secondary">
-          Cancel & Exit
+          <i class="bi bi-x-circle me-1"></i> Cancel & Exit
         </a>
-        <a href="/payments/gateway/{{ booking.pnr }}/" class="btn btn-rc-orange px-5 py-2 fs-6 fw-bold">
-          💳 Proceed to Demo Payment Gateway &rarr;
+        <a href="/payments/gateway/{{ booking.pnr }}/" class="btn btn-rc-primary px-5 py-2 fs-6 fw-bold">
+          Proceed to Payment <i class="bi bi-arrow-right ms-1"></i>
         </a>
       </div>
     </div>
