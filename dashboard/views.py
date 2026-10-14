@@ -88,7 +88,7 @@ def cancel_booking_view(request, pnr):
         if cancellation:
             messages.success(
                 request,
-                f"✅ Cancellation processed successfully! Demo refund of ₹{cancellation.refund_amount} has been credited. (Fee: ₹{cancellation.cancellation_fee})"
+                f"Cancellation processed successfully. A refund of ₹{cancellation.refund_amount} has been credited to your account."
             )
         else:
             messages.error(request, "No active passengers were selected for cancellation.")

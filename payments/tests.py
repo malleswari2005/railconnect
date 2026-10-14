@@ -92,7 +92,8 @@ class PaymentsTestCase(TestCase):
             'payment_method': 'DEBIT_CREDIT_CARD',
             'failure_reason': 'Card Declined'
         })
-        self.assertEqual(response.status_code, 200) # Renders failure template
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('payments:failure', args=[self.booking.pnr]))
 
         self.booking.refresh_from_db()
         self.passenger.refresh_from_db()

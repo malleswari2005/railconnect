@@ -84,13 +84,24 @@ def demo_gateway_view(request, pnr):
             )
 
             messages.error(request, f"Payment simulation failed: {failure_reason}")
-            return render(request, 'payments/failure.html', {
-                'booking': booking,
-                'payment': payment,
-            })
+            return redirect('payments:failure', pnr=booking.pnr)
 
     return render(request, 'payments/gateway.html', {
         'booking': booking,
+    })
+
+@login_required
+def payment_failure_view(request, pnr):
+    """Payment failure page with diagnostics and a retry button."""
+    booking = get_object_or_404(Booking, pnr=pnr)
+    if booking.user != request.user and not request.user.is_staff:
+        messages.error(request, "Unauthorized access.")
+        return redirect('core:home')
+
+    payment = Payment.objects.filter(booking=booking, status='FAILED').order_by('-created_at').first()
+    return render(request, 'payments/failure.html', {
+        'booking': booking,
+        'payment': payment,
     })
 
 @login_required

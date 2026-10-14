@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.urls import reverse
 from datetime import date, timedelta, time
+from django.utils import timezone
 from decimal import Decimal
 from trains.models import Station, Train, TrainStop, TrainClass
 from bookings.models import Booking, Passenger, JourneyInventory, Cancellation
@@ -130,6 +131,8 @@ class DashboardAndCancellationTestCase(TestCase):
     def test_cancellation_refund_tiers(self):
         """Test partial refund tier (12-48h: 50%) and non-refundable tier (<12h: 0%)."""
         # Tier 2: 24 hours in future (12-48h) -> 50% refund
+        self.train.departure_time = timezone.now().time()
+        self.train.save()
         journey_24h = date.today() + timedelta(days=1)
         b_24h = Booking.objects.create(
             pnr='4444444444',

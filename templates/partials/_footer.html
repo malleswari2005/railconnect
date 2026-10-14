@@ -1,79 +1,16 @@
-<footer class="rc-footer">
+<footer class="rc-footer py-3 border-top border-white border-opacity-10" style="background: var(--rc-navy-dark); color: #94A3B8;">
   <div class="container">
-    <div class="row g-4 mb-5">
-      <!-- Col 1: Brand & Mission -->
-      <div class="col-lg-4 col-md-6">
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <div class="d-inline-flex align-items-center justify-content-center bg-white rounded-3 p-1 shadow-sm" style="width: 32px; height: 32px;">
-            <i class="bi bi-train-front-fill fs-5" style="color: var(--rc-orange);"></i>
-          </div>
-          <span class="fs-4 fw-bold text-white tracking-tight">Rail<span style="color: var(--rc-orange);">Connect</span></span>
-        </div>
-        <p class="small text-light opacity-75 mb-3 pe-lg-3" style="line-height: 1.6;">
-          Fast, reliable express train ticketing across nationwide corridors. Seamless booking, real-time berth availability, transparent cancellation policies, and instant digital reservation vouchers.
-        </p>
-        <div class="d-flex gap-2">
-          <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-10 px-3 py-2">
-            <i class="bi bi-shield-check text-success me-1"></i> 256-Bit SSL Encrypted
-          </span>
-          <span class="badge bg-white bg-opacity-10 text-white border border-white border-opacity-10 px-3 py-2">
-            <i class="bi bi-clock-history text-warning me-1"></i> 24/7 Monitoring
-          </span>
-        </div>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 small">
+      <div>
+        <span>RailConnect is an independent booking platform and is not affiliated with Indian Railways or IRCTC. &copy; 2026 RailConnect.</span>
       </div>
-
-      <!-- Col 2: Navigation -->
-      <div class="col-lg-2 col-md-6 col-6">
-        <h6>Quick Links</h6>
-        <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
-          <li><a href="{% url 'core:home' %}"><i class="bi bi-chevron-right me-1 small"></i> Book Journey</a></li>
-          <li><a href="/bookings/pnr-lookup/"><i class="bi bi-chevron-right me-1 small"></i> PNR Status</a></li>
-          <li><a href="/trains/live-status/"><i class="bi bi-chevron-right me-1 small"></i> Live Running Status</a></li>
-          <li><a href="{% url 'core:about' %}"><i class="bi bi-chevron-right me-1 small"></i> About RailConnect</a></li>
-          <li><a href="/accounts/login/"><i class="bi bi-chevron-right me-1 small"></i> Passenger Login</a></li>
-        </ul>
+      <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'core:home' %}" class="text-light text-decoration-none opacity-75">Book Ticket</a>
+        <span class="text-white-50">&bull;</span>
+        <a href="{% url 'bookings:pnr_lookup' %}" class="text-light text-decoration-none opacity-75">PNR Status</a>
+        <span class="text-white-50">&bull;</span>
+        <a href="{% url 'core:about' %}" class="text-light text-decoration-none opacity-75">About Us</a>
       </div>
-
-      <!-- Col 3: Key Features -->
-      <div class="col-lg-3 col-md-6 col-6">
-        <h6>Platform Features</h6>
-        <ul class="list-unstyled small mb-0 d-flex flex-column gap-2 text-light opacity-75">
-          <li><i class="bi bi-lock-fill text-warning me-2"></i> Atomic Concurrency Locking</li>
-          <li><i class="bi bi-arrow-repeat text-success me-2"></i> Automatic Waitlist Promotion</li>
-          <li><i class="bi bi-qr-code text-info me-2"></i> Instant QR Boarding Passes</li>
-          <li><i class="bi bi-file-earmark-pdf text-danger me-2"></i> Vector PDF E-Ticket Download</li>
-          <li><i class="bi bi-speedometer2 text-primary me-2"></i> Low-Latency Route Search</li>
-        </ul>
-      </div>
-
-      <!-- Col 4: Cancellation Policy -->
-      <div class="col-lg-3 col-md-6">
-        <h6>RailConnect Cancellation Policy</h6>
-        <div class="p-3 rounded-3 bg-white bg-opacity-10 border border-white border-opacity-10 small text-light opacity-75">
-          <div class="d-flex justify-content-between mb-1">
-            <span>&gt; 48 hours prior:</span>
-            <strong class="text-success">90% Refund</strong>
-          </div>
-          <div class="d-flex justify-content-between mb-1">
-            <span>12 to 48 hours:</span>
-            <strong class="text-warning">50% Refund</strong>
-          </div>
-          <div class="d-flex justify-content-between">
-            <span>&lt; 12 hours:</span>
-            <strong class="text-danger">Non-refundable</strong>
-          </div>
-        </div>
-        <div class="mt-3 small text-muted">
-          Need assistance? Reach us at <a href="mailto:support@railconnect.example" class="text-white text-decoration-underline">support@railconnect.example</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Official Disclaimer Bar -->
-    <div class="border-top border-white border-opacity-10 pt-4 text-center small text-light opacity-75">
-      <p class="mb-1">
-        RailConnect is an independent booking platform and is not affiliated with Indian Railways or IRCTC. &copy; 2026 RailConnect. All rights reserved.
-      </p>
     </div>
   </div>
 </footer>

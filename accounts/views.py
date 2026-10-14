@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
+from django.utils.http import url_has_allowed_host_and_scheme
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm, CustomAuthenticationForm
 
 def register_view(request):
@@ -24,7 +25,7 @@ def register_view(request):
             profile.id_proof_number = form.cleaned_data.get('id_proof_number')
             profile.save()
 
-            messages.success(request, f"Welcome to RailConnect, {user.username}! Your account has been created. Please log in.")
+            messages.success(request, "Account created. Please log in.")
             return redirect('accounts:login')
         else:
             messages.error(request, "Please correct the errors below.")
@@ -44,8 +45,10 @@ def login_view(request):
             user = form.get_user()
             login(request, user)
             messages.success(request, f"Welcome back, {user.first_name or user.username}!")
-            next_url = request.GET.get('next') or request.POST.get('next') or 'core:home'
-            return redirect(next_url)
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if next_url and url_has_allowed_host_and_scheme(url=next_url, allowed_hosts={request.get_host()}):
+                return redirect(next_url)
+            return redirect('core:home')
         else:
             messages.error(request, "Invalid username or password. Please try again.")
     else:
@@ -57,7 +60,7 @@ def logout_view(request):
     """Handles logout."""
     if request.method == 'POST' or request.method == 'GET':
         logout(request)
-        messages.info(request, "You have been safely logged out.")
+        messages.info(request, "You have been logged out.")
     return redirect('core:home')
 
 @login_required

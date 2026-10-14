@@ -146,6 +146,8 @@ def train_search_view(request):
     from_query = request.GET.get('from_station', '').strip()
     to_query = request.GET.get('to_station', '').strip()
     date_str = request.GET.get('journey_date', '').strip()
+    class_code = request.GET.get('class_code', '').strip().upper()
+    passengers = request.GET.get('passengers', '1').strip()
 
     if not from_query or not to_query or not date_str:
         messages.warning(request, "Please enter both origin, destination stations, and journey date.")
@@ -248,6 +250,8 @@ def train_search_view(request):
         'day_abbr': day_abbr,
         'matching_trains': matching_trains,
         'trains_count': len(matching_trains),
+        'class_code': class_code,
+        'passengers': passengers,
     })
 
 def train_schedule_view(request, train_number):
