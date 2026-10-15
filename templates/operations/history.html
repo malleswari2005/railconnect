@@ -1,0 +1,124 @@
+{% extends 'dashboard/portal_base.html' %}
+{% load static %}
+
+{% block title %}Train Status Update History – Operations Control{% endblock %}
+
+{% block portal_icon %}bi bi-clock-history{% endblock %}
+{% block portal_title %}Operational Dispatch History{% endblock %}
+{% block portal_badge %}Dispatch Audit Log{% endblock %}
+{% block portal_subtitle %}Historical record of all real-time status updates broadcasted by network traffic controllers.{% endblock %}
+
+{% block portal_actions %}
+<a href="{% url 'operations:ops_dashboard' %}" class="btn btn-sm btn-outline-light d-flex align-items-center gap-2">
+  <i class="bi bi-arrow-left"></i> Back to Control Room
+</a>
+{% endblock %}
+
+{% block portal_content %}
+<div class="row g-4">
+  <!-- Filter Bar -->
+  <div class="col-12">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-3">
+      <form method="get" class="row g-3 align-items-center">
+        <div class="col-md-5">
+          <label class="form-label small text-muted fw-semibold mb-1">Search Train Number</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-train-front"></i></span>
+            <input type="text" name="train" class="form-control" placeholder="e.g. 12727 or 92801" value="{{ train_query|default:'' }}">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small text-muted fw-semibold mb-1">Journey Date</label>
+          <input type="date" name="date" class="form-control" value="{{ date_query|default:'' }}">
+        </div>
+        <div class="col-md-3 d-flex align-items-end gap-2">
+          <button type="submit" class="btn btn-primary fw-semibold px-3"><i class="bi bi-funnel me-1"></i> Filter</button>
+          {% if train_query or date_query %}
+            <a href="{% url 'operations:ops_history' %}" class="btn btn-outline-secondary">Reset</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Historical Updates Table -->
+  <div class="col-12">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+      <div class="card-header bg-white border-bottom border-light py-3 px-4 d-flex align-items-center justify-content-between">
+        <h5 class="mb-0 fw-bold text-dark">Status Broadcast History</h5>
+        <span class="text-muted small">Showing {{ updates|length }} entries</span>
+      </div>
+
+      <div class="card-body p-0">
+        {% if updates %}
+          <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4">Broadcast Time</th>
+                  <th>Train</th>
+                  <th>Journey Date</th>
+                  <th>Station Reported</th>
+                  <th>Reported Status</th>
+                  <th>Delay</th>
+                  <th>Controller</th>
+                  <th class="pe-4">Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for u in updates %}
+                  <tr>
+                    <td class="ps-4">
+                      <div class="fw-semibold text-dark">{{ u.created_at|date:"d M Y" }}</div>
+                      <div class="small text-muted">{{ u.created_at|date:"H:i:s" }}</div>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary me-1">{{ u.train.train_number }}</span>
+                      <strong class="text-dark">{{ u.train.name }}</strong>
+                    </td>
+                    <td>{{ u.journey_date|date:"d M Y" }}</td>
+                    <td>
+                      <span class="badge bg-light text-dark border">{{ u.current_station.code }}</span>
+                      <span class="small text-muted ms-1">{{ u.current_station.name }}</span>
+                    </td>
+                    <td>
+                      {% if u.status == 'ON_TIME' %}
+                        <span class="badge bg-success-subtle text-success border border-success-subtle">On Time</span>
+                      {% elif u.status == 'DELAYED' %}
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Delayed</span>
+                      {% elif u.status == 'CANCELLED' %}
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle">Cancelled</span>
+                      {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary">{{ u.get_status_display }}</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      {% if u.delay_minutes > 0 %}
+                        <span class="text-danger fw-bold">+{{ u.delay_minutes }} min</span>
+                      {% else %}
+                        <span class="text-success fw-semibold">0 min</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <span class="small text-muted">{{ u.updated_by.username|default:"System" }}</span>
+                    </td>
+                    <td class="pe-4">
+                      <span class="small text-muted">{{ u.remarks|default:"&mdash;" }}</span>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="p-5 text-center text-muted">
+            <i class="bi bi-clock-history fs-1 text-muted"></i>
+            <h6 class="mt-3 fw-bold text-dark">No Status Updates Found</h6>
+            <p class="small mb-0">No historical train status broadcasts match your query filters.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

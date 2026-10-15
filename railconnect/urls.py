@@ -12,6 +12,7 @@ urlpatterns = [
     path('payments/', include('payments.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('tte/', include('dashboard.urls_tte')),
+    path('operations/', include('dashboard.urls_ops')),
 ]
 
 if settings.DEBUG:

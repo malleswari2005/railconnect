@@ -8,7 +8,11 @@
     <div class="d-inline-flex align-items-center gap-2 bg-white bg-opacity-15 px-3 py-1 rounded-pill mb-2">
       <i class="bi bi-radar text-warning"></i>
       <span class="small fw-semibold">Train Radar & Signaling Tracker</span>
-      <span class="badge bg-secondary-subtle text-secondary small" style="font-size: 0.7rem;">Sample data</span>
+      {% if is_sample %}
+        <span class="badge bg-secondary-subtle text-secondary small" style="font-size: 0.75rem;">Sample data (no live update posted today)</span>
+      {% else %}
+        <span class="badge bg-success text-white small" style="font-size: 0.75rem;"><i class="bi bi-broadcast me-1"></i>Live Operations Control Feed</span>
+      {% endif %}
     </div>
     <h1 class="h2 fw-bold text-white mb-2">Live Train Running Status</h1>
     <p class="text-white-50 small mx-auto mb-0" style="max-width: 600px;">
@@ -58,20 +62,36 @@
             <i class="bi bi-geo-alt text-primary me-1"></i> {{ train.source_station.name }} ({{ train.source_station.code }}) &rarr; {{ train.destination_station.name }} ({{ train.destination_station.code }})
           </div>
         </div>
-        <div>
-          <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fs-6 fw-semibold d-inline-flex align-items-center gap-2">
-            <span class="spinner-grow spinner-grow-sm text-success" role="status"></span>
+        <div class="d-flex flex-column align-items-md-end gap-1">
+          <span class="badge {% if not is_sample and real_update.status != 'ON_TIME' %}bg-warning-subtle text-warning border border-warning-subtle{% else %}bg-success-subtle text-success border border-success-subtle{% endif %} px-3 py-2 fs-6 fw-semibold d-inline-flex align-items-center gap-2">
+            <span class="spinner-grow spinner-grow-sm {% if not is_sample and real_update.status != 'ON_TIME' %}text-warning{% else %}text-success{% endif %}" role="status"></span>
             {{ current_status_summary }}
+          </span>
+          <span class="small text-muted">
+            {% if is_sample %}
+              <i class="bi bi-info-circle me-1"></i> Sample data (no live update posted today)
+            {% else %}
+              <i class="bi bi-broadcast text-success me-1"></i> Source: {{ data_source }} &bull; Updated {{ last_updated|date:"H:i" }}
+            {% endif %}
           </span>
         </div>
       </div>
+
+      {% if not is_sample and real_update.remarks %}
+        <div class="alert alert-info py-2 px-3 small rounded-3 mb-3 d-flex align-items-center gap-2">
+          <i class="bi bi-megaphone-fill text-info"></i>
+          <div><strong>Operations Controller Notice:</strong> {{ real_update.remarks }}</div>
+        </div>
+      {% endif %}
 
       <!-- Live Timeline -->
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h3 class="h6 fw-bold text-dark mb-0 d-flex align-items-center gap-2">
           <i class="bi bi-diagram-3 text-primary"></i> Route Halts & Progress
         </h3>
-        <span class="small text-muted">Auto-refreshed with simulated signaling</span>
+        <span class="small text-muted">
+          {% if is_sample %}Auto-refreshed with simulated signaling{% else %}Live GPS & Operations Dispatch{% endif %}
+        </span>
       </div>
 
       <div class="position-relative ps-4 border-start border-3 border-primary ms-3">

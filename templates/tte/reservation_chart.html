@@ -1,10 +1,10 @@
 {% extends 'dashboard/portal_base.html' %}
 {% load static %}
 
-{% block title %}Reservation Chart: {{ assignment.train.number }} ({{ assignment.journey_date }}) – RailConnect{% endblock %}
+{% block title %}Reservation Chart: {{ assignment.train.train_number }} ({{ assignment.journey_date }}) – RailConnect{% endblock %}
 
 {% block portal_icon %}bi bi-card-checklist{% endblock %}
-{% block portal_title %}Train {{ assignment.train.number }} – {{ assignment.train.name }}{% endblock %}
+{% block portal_title %}Train {{ assignment.train.train_number }} – {{ assignment.train.name }}{% endblock %}
 {% block portal_badge %}Reservation Chart{% endblock %}
 {% block portal_subtitle %}{{ assignment.train.source_station.name }} ({{ assignment.train.source_station.code }}) &rarr; {{ assignment.train.destination_station.name }} ({{ assignment.train.destination_station.code }}) | Date: {{ assignment.journey_date|date:"D, d M Y" }}{% endblock %}
 

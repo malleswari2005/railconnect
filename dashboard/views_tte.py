@@ -24,7 +24,7 @@ def tte_dashboard_view(request):
 
     assignments_qs = assignments_qs.select_related(
         'train', 'train__source_station', 'train__destination_station', 'tte'
-    ).order_by('journey_date', 'train__number')
+    ).order_by('journey_date', 'train__train_number')
 
     today_assignments = [a for a in assignments_qs if a.journey_date == today]
     upcoming_assignments = [a for a in assignments_qs if a.journey_date > today]

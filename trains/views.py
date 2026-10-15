@@ -264,39 +264,82 @@ def train_schedule_view(request, train_number):
     })
 
 def live_status_view(request):
-    """Simulates real-time train running status with visual stop timeline."""
+    """
+    Real-time train running status with visual stop timeline.
+    Reads from live Operations updates when available; otherwise falls back
+    to simulated sample status labeled clearly.
+    """
     train_number = request.GET.get('train_number', '').strip()
     train = None
     stops_status = []
     current_status_summary = ""
+    is_sample = True
+    data_source = "Sample data (no live update posted today)"
+    last_updated = None
+    real_update = None
 
     if train_number:
         train = Train.objects.filter(train_number=train_number).prefetch_related('stops__station').first()
         if not train:
             messages.error(request, f"Train #{train_number} not found.")
         else:
-            now = datetime.now()
-            current_time = now.time()
+            today = date.today()
+            from dashboard.models import TrainStatusUpdate
+            real_update = TrainStatusUpdate.objects.filter(
+                train=train, journey_date=today
+            ).select_related('current_station', 'updated_by').order_by('-updated_at').first()
+
             stops = list(train.stops.all().order_by('stop_order'))
             total_stops = len(stops)
 
-            # Simulated calculation: determine index based on time of day
-            passed = True
-            active_stop_idx = 0
-            for idx, stop in enumerate(stops):
-                stop_time = stop.departure_time or stop.arrival_time or time(8, 0)
-                is_passed = (stop_time <= current_time)
-                if not is_passed and passed:
-                    active_stop_idx = max(0, idx - 1)
-                    passed = False
-                stops_status.append({
-                    'stop': stop,
-                    'is_passed': is_passed,
-                    'is_current': (idx == active_stop_idx),
-                    'delay_mins': 5 if idx > 0 else 0, # simulated mild delay
-                })
+            if real_update:
+                is_sample = False
+                data_source = "Live Operations Control Feed"
+                last_updated = real_update.updated_at
 
-            current_status_summary = f"Simulated Status: Running on time near {stops[active_stop_idx].station.name} ({stops[active_stop_idx].station.code})"
+                current_station_id = real_update.current_station_id
+                active_stop_idx = 0
+                for idx, stop in enumerate(stops):
+                    if stop.station_id == current_station_id:
+                        active_stop_idx = idx
+                        break
+
+                for idx, stop in enumerate(stops):
+                    is_current = (idx == active_stop_idx)
+                    is_passed = (idx < active_stop_idx)
+                    delay = real_update.delay_minutes if (idx >= active_stop_idx) else 0
+                    stops_status.append({
+                        'stop': stop,
+                        'is_passed': is_passed,
+                        'is_current': is_current,
+                        'delay_mins': delay,
+                    })
+
+                status_display = real_update.get_status_display()
+                if real_update.delay_minutes > 0:
+                    current_status_summary = f"{status_display} ({real_update.delay_minutes}m delay) at/near {real_update.current_station.name} ({real_update.current_station.code})"
+                else:
+                    current_status_summary = f"{status_display} at {real_update.current_station.name} ({real_update.current_station.code})"
+            else:
+                now = datetime.now()
+                current_time = now.time()
+                passed = True
+                active_stop_idx = 0
+                for idx, stop in enumerate(stops):
+                    stop_time = stop.departure_time or stop.arrival_time or time(8, 0)
+                    is_passed = (stop_time <= current_time)
+                    if not is_passed and passed:
+                        active_stop_idx = max(0, idx - 1)
+                        passed = False
+                    stops_status.append({
+                        'stop': stop,
+                        'is_passed': is_passed,
+                        'is_current': (idx == active_stop_idx),
+                        'delay_mins': 5 if idx > 0 else 0, # simulated mild delay
+                    })
+
+                if stops:
+                    current_status_summary = f"Simulated Status: Running on time near {stops[active_stop_idx].station.name} ({stops[active_stop_idx].station.code})"
 
     sample_trains = Train.objects.filter(is_active=True)[:6]
 
@@ -306,6 +349,10 @@ def live_status_view(request):
         'stops_status': stops_status,
         'current_status_summary': current_status_summary,
         'sample_trains': sample_trains,
+        'is_sample': is_sample,
+        'data_source': data_source,
+        'last_updated': last_updated,
+        'real_update': real_update,
     })
 
 def station_autocomplete_view(request):
