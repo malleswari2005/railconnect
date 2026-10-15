@@ -131,6 +131,24 @@ class Passenger(models.Model):
         seat_str = f"Seat: {self.allocated_seat}" if self.allocated_seat else f"WL #{self.waitlist_number}"
         return f"{self.name} ({self.status} - {seat_str})"
 
+    @property
+    def coach_number(self):
+        if self.allocated_seat and self.allocated_seat.coach:
+            return self.allocated_seat.coach.coach_code
+        return None
+
+    @property
+    def seat_number(self):
+        if self.allocated_seat:
+            return str(self.allocated_seat.seat_number)
+        return None
+
+    @property
+    def berth_type(self):
+        if self.allocated_seat:
+            return self.allocated_seat.get_berth_type_display()
+        return None
+
 class AllocatedJourneySeat(models.Model):
     """Physical concurrency lock record: one physical seat per journey date."""
     seat = models.ForeignKey(Seat, on_delete=models.CASCADE, related_name='journey_locks')

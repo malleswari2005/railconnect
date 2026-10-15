@@ -31,6 +31,8 @@ def get_role_home_url(user):
         return '/operations/'
     return '/'
 
+from django.urls import reverse
+
 def role_required(allowed_roles):
     """
     Decorator for views that checks if the logged in user belongs to one of the allowed roles.
@@ -41,12 +43,13 @@ def role_required(allowed_roles):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
             if not request.user.is_authenticated:
-                return redirect(f"{settings.LOGIN_URL}?next={request.get_full_path()}")
+                login_url = reverse(settings.LOGIN_URL) if ':' in settings.LOGIN_URL else settings.LOGIN_URL
+                return redirect(f"{login_url}?next={request.get_full_path()}")
 
             user_role = get_user_role(request.user)
 
-            # Superusers always have universal oversight
-            if request.user.is_superuser or user_role in allowed_roles:
+            # Superusers and Admins always have universal oversight
+            if request.user.is_superuser or user_role == 'Admin' or user_role in allowed_roles:
                 return view_func(request, *args, **kwargs)
 
             return render(request, '403.html', {

@@ -105,7 +105,7 @@ def cancel_booking_view(request, pnr):
     })
 
 def is_staff_check(user):
-    return user.is_authenticated and user.is_staff
+    return user.is_authenticated and (user.is_staff or user.is_superuser or user.groups.filter(name='Admin').exists())
 
 @user_passes_test(is_staff_check, login_url='accounts:login')
 def staff_dashboard_view(request):

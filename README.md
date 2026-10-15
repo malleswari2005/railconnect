@@ -3,17 +3,43 @@
 [![Django](https://img.shields.io/badge/Django-6.0-092e20.svg?logo=django&logoColor=white)](https://www.djangoproject.com/)
 [![Python](https://img.shields.io/badge/Python-3.14-3776ab.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-30%20Passed%20(100%25)-success.svg)](#-automated-testing)
+[![Tests](https://img.shields.io/badge/Tests-51%20Passed%20(100%25)-success.svg)](#-automated-testing)
 [![Offline](https://img.shields.io/badge/Offline-100%25%20Self--Contained-orange.svg)](#-offline-readiness)
 
-An enterprise-grade Django web application inspired by the **Indian Railway Catering and Tourism Corporation (IRCTC)** reservation architecture, featuring a realistic **Andhra Pradesh-focused railway network** (30+ stations, 36 fictional trains, 7 trunk/intercity corridors). Built to demonstrate high-concurrency seat locking, database normalization, automated waitlist promotion, and offline resilience.
+An enterprise-grade Django web application inspired by the **Indian Railway Catering and Tourism Corporation (IRCTC)** reservation architecture, featuring a realistic **Andhra Pradesh-focused railway network** (40+ stations, 39 fictional trains, 7 trunk/intercity corridors) and **Three Role-Based Staff Portals** (TTE Duty Portal, Operations Control Room, and Administrator Control Tower). Built to demonstrate high-concurrency seat locking, database normalization, automated waitlist promotion, and offline resilience.
 
 > **Notice on Timetables & Train Data**:
 > Train numbers (fictional 9xxxx series), train names, halt timings, fare calculations, and seat availability represented in this project are sample data generated for demonstration purposes and are **not** real Indian Railways or IRCTC schedules.
 
 ---
 
-## 🌟 Key Features
+## 🏛️ Role-Based Staff Portals & Architecture
+
+RailConnect provides role-based access control (RBAC) enforced via server-side Django Groups and role decorators with custom 403 Forbidden pages and intelligent role-based login redirection:
+
+1. **Traveling Ticket Examiner (TTE) Portal (`/tte/`)**:
+   - **Duty Dashboard**: Live assigned train services for today, upcoming duty schedules, and past services.
+   - **Reservation Charts**: Coach-wise passenger manifests with verification status filtering (Verified, Absent, Irregular, Invalid ID).
+   - **Ticket Verification**: Records immutable `TicketCheck` inspection events. Under strict security protocol, TTE verification **never** mutates core `Passenger.status` or `Booking.status`.
+   - **Duty PNR Lookup**: Restricted strictly to the TTE's explicitly assigned journeys.
+
+2. **Operations Control Center (`/operations/`)**:
+   - **Fleet Status Monitor**: Real-time operational overview of running trains, delays, and current station locations.
+   - **Live Dispatch Broadcasts**: Posts real-time train status updates (`TrainStatusUpdate`) that immediately sync with the public passenger-facing `/trains/live-status/` tracker.
+   - **Network Operational Bulletins**: Publish, manage, and archive operational alerts and speed/platform notices (`OperationalNotice`).
+   - **Dispatch Audit Trail**: Historical search of all operational broadcasts by train number and journey date.
+
+3. **Administrator Control Tower (`/admin-portal/`)**:
+   - **User & Staff Directory**: Complete user directory with role tier inspection and staff account provisioning (TTE & Operations only, with strict Django password validation enforcement). TTE and Operations accounts do not receive administrative `is_staff` or superuser privileges.
+   - **TTE Duty Rosters**: Schedule, assign, and revoke TTE duty assignments to trains and journey dates.
+   - **System-Wide Reservations Search**: Comprehensive reservation search by PNR, passenger name, route, and date with refund tracking.
+   - **Simulated Payment Ledger**: Audit simulated payment gateway transactions, gateway reference IDs, and payment methods.
+   - **Operational Intelligence & Reports**: Class-wise revenue breakdown, top train volume, and waitlist fulfillment conversion metrics.
+   - **Immutable System Audit Trail**: Complete activity audit trail capturing staff creations, TTE assignments, status broadcasts, and ticket checks.
+
+---
+
+## 🌟 Core System Features
 
 1. **High-Concurrency Seat Engine**:
    - Pessimistic row-level locking via `select_for_update()` inside `transaction.atomic()` blocks.
@@ -47,20 +73,20 @@ An enterprise-grade Django web application inspired by the **Indian Railway Cate
 +-----------------------------------------------------------------------------------+
 |                                 CLIENT TIER                                       |
 |  Responsive HTML5 / CSS3 / Vanilla JS + Bootstrap 5.3 (Offline Local Bundle)      |
-|  Navy Blue (#0b2545), Pure White (#ffffff), Vibrant Orange (#ff7a00) Accent       |
+|  Navy Blue (#0B1F3A), Pure White (#FFFFFF), Vibrant Orange (#FF7A18) Accent       |
 +-----------------------------------------------------------------------------------+
                                         |  HTTP/HTTPS Requests (CSRF Protected)
 +---------------------------------------v-------------------------------------------+
 |                                DJANGO 6 APP CORE                                  |
 |  +--------------------+  +--------------------+  +--------------------+           |
 |  |     accounts       |  |       trains       |  |      bookings      |           |
-|  | Auth, Profiles,    |  | Stations, Routes,  |  | Inventory, Seats,  |           |
-|  | Ownership Guards   |  | Search & Schedules |  | Concurrency Engine |           |
+|  | Auth, RBAC Groups, |  | Stations, Routes,  |  | Inventory, Seats,  |           |
+|  | Role Redirection   |  | Search & Live Feed |  | Concurrency Engine |           |
 |  +--------------------+  +--------------------+  +--------------------+           |
 |  +--------------------+  +--------------------+  +--------------------+           |
 |  |     payments       |  |     dashboard      |  |       core         |           |
-|  | Demo Gateway,      |  | Staff Analytics,   |  | Shared Base UI,    |           |
-|  | State Transitions  |  | Customer Portal    |  | Error Handlers     |           |
+|  | Demo Gateway,      |  | TTE, Operations,   |  | Shared Base UI,    |           |
+|  | Ledger Records     |  | Admin, Audit Trail |  | Error Handlers 403 |           |
 |  +--------------------+  +--------------------+  +--------------------+           |
 +-----------------------------------------------------------------------------------+
        |                                   |                           |
@@ -104,9 +130,10 @@ python manage.py migrate
 python manage.py seed_demo_data
 ```
 > `seed_demo_data` automatically seeds:
-> - 15 Major Indian Railway Stations (NDLS, MMCT, HWH, SBC, MAS, ADI, CNB, PNBE, etc.)
-> - 12 Multi-stop Trains with Classes & Berths (Rajdhani, Shatabdi, Vande Bharat, etc.)
-> - 3 Pre-configured Demo Accounts for instant evaluation
+> - 43 Andhra Pradesh network stations and national trunk anchors (BZA, VSKP, TPTY, RU, GNT, NLR, SBC, MAS, SC, etc.)
+> - 39 Realistic train services with physical coaches, seats, and 14-day inventories
+> - 4 Role-based Groups (`Passenger`, `TTE`, `Operations`, `Admin`)
+> - 5 Pre-configured demo accounts
 
 ### 5. Launch the Server
 ```bash
@@ -116,19 +143,25 @@ Visit `http://127.0.0.1:8000/` in your browser.
 
 ---
 
-## 👥 Demo Accounts & Credentials (Viva Ready)
+## 👥 Demo Accounts & Credentials
 
-| Role | Username | Password | Purpose & Access Level |
-| :--- | :--- | :--- | :--- |
-| **Control Room Admin** | `staff_admin` | `AdminPass@123` | Full access to Staff Dashboard, KPIs, charts, train master, and `/admin/` |
-| **Passenger 1** | `passenger1` | `Pass@123` | Pre-configured customer with existing bookings and journey history |
-| **Passenger 2** | `passenger2` | `Pass@123` | Second customer for testing waitlist promotion & concurrent bookings |
+| Role | Username | Password (Default) | Environment Variable Override | Purpose & Access Level |
+| :--- | :--- | :--- | :--- | :--- |
+| **System Admin** | `staff_admin` | `AdminPass@123` | `ADMIN_DEMO_PASSWORD` | Universal oversight, `/admin-portal/`, staff provisioning, `/admin/` |
+| **TTE Officer** | `tte_officer` | `TtePass@123` | `TTE_DEMO_PASSWORD` | Access to `/tte/`, duty charts, passenger verification, duty PNR lookup |
+| **Operations Controller** | `ops_controller` | `OpsPass@123` | `OPS_DEMO_PASSWORD` | Access to `/operations/`, status broadcasts, alerts, dispatch history |
+| **Passenger 1** | `passenger1` | `Pass@123` | &mdash; | Pre-configured customer with existing bookings and journey history |
+| **Passenger 2** | `passenger2` | `Pass@123` | &mdash; | Second customer for testing waitlist promotion & concurrent bookings |
+
+> [!IMPORTANT]
+> **Production & Render Deployment Security Note**:
+> Demo staff passwords can be overridden by setting the environment variables `ADMIN_DEMO_PASSWORD`, `TTE_DEMO_PASSWORD`, and `OPS_DEMO_PASSWORD`. In production environments (such as Render or Railway), these environment variables **must be configured** with strong passwords to secure staff portals.
 
 ---
 
 ## 🧪 Automated Testing
 
-RailConnect comes with a comprehensive test suite of **30 automated tests** covering authentication, search validation, concurrency locks, double booking prevention, tiered cancellations, waitlist FIFO shifts, staff access controls, and AP network stop chronology, distance monotonicity, tariff calculation, and search validation:
+RailConnect comes with a comprehensive test suite of **51 automated tests** covering authentication, search validation, concurrency locks, double booking prevention, tiered cancellations, waitlist FIFO shifts, cross-portal role permission enforcement, TTE verification immutability, operations live sync, password security, and AP network stop chronology:
 
 ```bash
 python manage.py test
@@ -137,46 +170,13 @@ python manage.py test
 Expected output:
 ```text
 Creating test database for alias 'default'...
-..............................
+...................................................
 ----------------------------------------------------------------------
-Ran 30 tests in ~35s
+Ran 51 tests in ~115s
 
 OK
 Destroying test database for alias 'default'...
 ```
-
----
-
-## 📖 Step-by-Step Viva Demonstration Walkthrough
-
-1. **Search Trains**:
-   - On the homepage, select **From: NDLS** and **To: CNB** with a future date.
-   - Click **Find Trains**. Observe multi-stop trains passing through Kanpur Central with class-wise fare calculation.
-2. **Book Tickets**:
-   - Click **Book** on AC 3-Tier (3A). Enter passenger names and berth preferences.
-   - Review booking summary on the review screen.
-3. **Simulate Payment**:
-   - On the Demo Payment Gateway, click **Simulate Successful Payment**.
-   - Notice atomic seat reservation and automatic redirection to the Digital Boarding Pass with scannable QR.
-4. **Download PDF Ticket**:
-   - Click **Download Vector PDF** to inspect the ReportLab ERS slip.
-5. **Verify Waitlist Auto-Promotion**:
-   - Log in as `passenger2`. Book the remaining seat until waitlisted.
-   - Switch back to `passenger1` and cancel the confirmed seat from **My Bookings**.
-   - Notice that `passenger1` receives a calculated 90% refund and `passenger2` is automatically promoted to Confirmed!
-6. **Inspect Staff Dashboard**:
-   - Log in as `staff_admin` and navigate to **Staff Dashboard**.
-   - View real-time revenue telemetry and interactive Chart.js graphs.
-
----
-
-## 📚 Technical Documentation
-
-Detailed architectural and viva reference documents are located in `docs/`:
-- **[PROJECT_SPEC.md](docs/PROJECT_SPEC.md)**: Full functional & non-functional technical specification.
-- **[ER_DIAGRAM.md](docs/ER_DIAGRAM.md)**: Mermaid Entity-Relationship diagram and normalization analysis.
-- **[CANCELLATION_AND_WAITLIST_RULES.md](docs/CANCELLATION_AND_WAITLIST_RULES.md)**: Detailed refund tier formulas and waitlist promotion state diagrams.
-- **[TEAM_PLAN.md](docs/TEAM_PLAN.md)**: 5-member team module division, code contracts, and student viva question guide.
 
 ---
 
@@ -188,6 +188,9 @@ Detailed architectural and viva reference documents are located in `docs/`:
    DEBUG=False
    ALLOWED_HOSTS=<your-domain>.render.com,localhost
    DATABASE_URL=postgres://user:password@host:port/dbname
+   ADMIN_DEMO_PASSWORD=<strong-admin-password>
+   TTE_DEMO_PASSWORD=<strong-tte-password>
+   OPS_DEMO_PASSWORD=<strong-ops-password>
    ```
 2. Build command:
    ```bash
@@ -200,5 +203,5 @@ Detailed architectural and viva reference documents are located in `docs/`:
 
 ---
 
-## 📜 License & Academic Notice
-This project is open-source under the MIT License and was developed for educational and academic evaluation purposes.
+## 📜 License & Notice
+This project is open-source under the MIT License and was developed for professional demonstration and evaluation purposes.
