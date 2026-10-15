@@ -1,0 +1,115 @@
+{% extends 'dashboard/portal_base.html' %}
+{% load static %}
+
+{% block title %}Provision Staff Account – Admin Portal{% endblock %}
+
+{% block portal_icon %}bi bi-person-plus-fill{% endblock %}
+{% block portal_title %}Provision Staff Account{% endblock %}
+{% block portal_badge %}Staff Provisioning{% endblock %}
+{% block portal_subtitle %}Create credentialed operational accounts for Traveling Ticket Examiners (TTE) and Operations Traffic Controllers.{% endblock %}
+
+{% block portal_actions %}
+<a href="{% url 'admin_portal:admin_users' %}" class="btn btn-sm btn-outline-light d-flex align-items-center gap-2">
+  <i class="bi bi-arrow-left"></i> Back to Directory
+</a>
+{% endblock %}
+
+{% block portal_nav_tabs %}
+  {% include 'admin_portal/_tabs.html' %}
+{% endblock %}
+
+{% block portal_content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8 col-xl-7">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4 p-md-5">
+      <div class="mb-4">
+        <h5 class="fw-bold text-dark mb-1">New Operational Staff Account</h5>
+        <p class="text-muted small">
+          Staff accounts have role-scoped access to on-board verification or signaling dispatch. Under security policy, TTE and Operations users are granted role group membership and do not receive administrative <code class="small text-danger">is_staff</code> flags.
+        </p>
+      </div>
+
+      <form method="post" action="{% url 'admin_portal:admin_create_staff' %}">
+        {% csrf_token %}
+
+        <!-- Role Selector -->
+        <div class="mb-4">
+          <label class="form-label small fw-bold text-dark">Staff Role Tier <span class="text-danger">*</span></label>
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <div class="form-check p-3 border rounded-3 bg-light">
+                <input class="form-check-input ms-0 me-2" type="radio" name="role" id="roleTTE" value="TTE" checked>
+                <label class="form-check-label fw-bold text-dark" for="roleTTE">
+                  <i class="bi bi-person-check text-primary me-1"></i> TTE (Ticket Examiner)
+                  <div class="small fw-normal text-muted mt-1">Access to duty charts, passenger verification, and duty PNR lookup.</div>
+                </label>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-check p-3 border rounded-3 bg-light">
+                <input class="form-check-input ms-0 me-2" type="radio" name="role" id="roleOps" value="Operations">
+                <label class="form-check-label fw-bold text-dark" for="roleOps">
+                  <i class="bi bi-broadcast text-info me-1"></i> Operations Controller
+                  <div class="small fw-normal text-muted mt-1">Broadcast train status updates, platform dispatch, and operational notices.</div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Credentials -->
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold text-dark">Username <span class="text-danger">*</span></label>
+            <input type="text" name="username" class="form-control" placeholder="e.g. tte_rajesh or ops_suresh" required>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold text-dark">Official Email Address <span class="text-danger">*</span></label>
+            <input type="email" name="email" class="form-control" placeholder="e.g. rajesh@railconnect.local" required>
+          </div>
+        </div>
+
+        <!-- Personal Details -->
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold text-dark">First Name</label>
+            <input type="text" name="first_name" class="form-control" placeholder="First name">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold text-dark">Last Name</label>
+            <input type="text" name="last_name" class="form-control" placeholder="Last name">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small fw-semibold text-dark">Contact Phone Number</label>
+          <input type="tel" name="phone_number" class="form-control" placeholder="10-digit mobile number">
+        </div>
+
+        <!-- Security Passwords -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold text-dark">Account Password <span class="text-danger">*</span></label>
+            <input type="password" name="password" class="form-control" placeholder="Min 8 chars, mixed case" required>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label small fw-semibold text-dark">Confirm Password <span class="text-danger">*</span></label>
+            <input type="password" name="confirm_password" class="form-control" placeholder="Re-type password" required>
+          </div>
+        </div>
+
+        <div class="alert alert-light border small text-muted mb-4">
+          <i class="bi bi-shield-lock me-1"></i> Passwords must satisfy Django system security checks (minimum length, non-common, and non-numeric).
+        </div>
+
+        <div class="d-flex align-items-center justify-content-end gap-2">
+          <a href="{% url 'admin_portal:admin_users' %}" class="btn btn-light">Cancel</a>
+          <button type="submit" class="btn btn-primary fw-semibold px-4">
+            <i class="bi bi-check2-circle me-1"></i> Provision Account
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

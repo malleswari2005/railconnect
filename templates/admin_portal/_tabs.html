@@ -1,0 +1,25 @@
+<div class="px-4 pb-2 pt-0 border-top border-secondary border-opacity-25">
+  <nav class="nav nav-pills gap-1 flex-wrap pt-2">
+    <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active bg-warning text-dark{% else %}text-white{% endif %} py-1 px-3 fw-semibold small rounded-pill" href="{% url 'admin_portal:admin_dashboard' %}">
+      <i class="bi bi-speedometer2 me-1"></i> Dashboard
+    </a>
+    <a class="nav-link {% if 'user' in request.resolver_match.url_name %}active bg-warning text-dark{% else %}text-white{% endif %} py-1 px-3 fw-semibold small rounded-pill" href="{% url 'admin_portal:admin_users' %}">
+      <i class="bi bi-people me-1"></i> Users & Staff
+    </a>
+    <a class="nav-link {% if 'assignment' in request.resolver_match.url_name %}active bg-warning text-dark{% else %}text-white{% endif %} py-1 px-3 fw-semibold small rounded-pill" href="{% url 'admin_portal:admin_assignments' %}">
+      <i class="bi bi-calendar2-check me-1"></i> TTE Rosters
+    </a>
+    <a class="nav-link {% if 'booking' in request.resolver_match.url_name %}active bg-warning text-dark{% else %}text-white{% endif %} py-1 px-3 fw-semibold small rounded-pill" href="{% url 'admin_portal:admin_bookings' %}">
+      <i class="bi bi-ticket-perforated me-1"></i> System Bookings
+    </a>
+    <a class="nav-link {% if 'payment' in request.resolver_match.url_name %}active bg-warning text-dark{% else %}text-white{% endif %} py-1 px-3 fw-semibold small rounded-pill" href="{% url 'admin_portal:admin_payments' %}">
+      <i class="bi bi-credit-card me-1"></i> Test Payments
+    </a>
+    <a class="nav-link {% if 'report' in request.resolver_match.url_name %}active bg-warning text-dark{% else %}text-white{% endif %} py-1 px-3 fw-semibold small rounded-pill" href="{% url 'admin_portal:admin_reports' %}">
+      <i class="bi bi-graph-up me-1"></i> Analytics & Reports
+    </a>
+    <a class="nav-link {% if 'audit' in request.resolver_match.url_name %}active bg-warning text-dark{% else %}text-white{% endif %} py-1 px-3 fw-semibold small rounded-pill" href="{% url 'admin_portal:admin_audit_logs' %}">
+      <i class="bi bi-journal-check me-1"></i> Audit Trail
+    </a>
+  </nav>
+</div>

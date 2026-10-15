@@ -13,6 +13,7 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('tte/', include('dashboard.urls_tte')),
     path('operations/', include('dashboard.urls_ops')),
+    path('admin-portal/', include('dashboard.urls_admin')),
 ]
 
 if settings.DEBUG:

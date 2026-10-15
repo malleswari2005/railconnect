@@ -1,0 +1,137 @@
+{% extends 'dashboard/portal_base.html' %}
+{% load static %}
+
+{% block title %}Operational Analytics & Reports – Admin Portal{% endblock %}
+
+{% block portal_icon %}bi bi-graph-up-arrow{% endblock %}
+{% block portal_title %}Operational Intelligence & Reports{% endblock %}
+{% block portal_badge %}Business Analytics{% endblock %}
+{% block portal_subtitle %}Revenue breakdown by travel tier, fleet booking volume, and waitlist fulfillment metrics.{% endblock %}
+
+{% block portal_actions %}
+<a href="{% url 'admin_portal:admin_dashboard' %}" class="btn btn-sm btn-outline-light d-flex align-items-center gap-2">
+  <i class="bi bi-arrow-left"></i> Back to Dashboard
+</a>
+{% endblock %}
+
+{% block portal_nav_tabs %}
+  {% include 'admin_portal/_tabs.html' %}
+{% endblock %}
+
+{% block portal_content %}
+<div class="row g-4">
+  <!-- Passenger Fulfillment Status Distribution -->
+  <div class="col-12">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <h5 class="fw-bold text-dark mb-3">Passenger Fulfillment Distribution</h5>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 bg-success bg-opacity-10 border border-success border-opacity-25">
+            <div class="text-success small fw-bold text-uppercase">Confirmed Berths</div>
+            <div class="fs-2 fw-bold text-success mt-1">{{ total_confirmed_passengers }}</div>
+            <div class="small text-muted">{{ confirmed_ratio }}% of total tickets fulfilled</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 bg-warning bg-opacity-10 border border-warning border-opacity-25">
+            <div class="text-warning small fw-bold text-uppercase">Waitlisted (WL) Requests</div>
+            <div class="fs-2 fw-bold text-dark mt-1">{{ total_waitlisted_passengers }}</div>
+            <div class="small text-muted">{{ wl_ratio }}% current waitlist pressure</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="p-3 rounded-3 bg-danger bg-opacity-10 border border-danger border-opacity-25">
+            <div class="text-danger small fw-bold text-uppercase">Cancelled Passengers</div>
+            <div class="fs-2 fw-bold text-danger mt-1">{{ total_cancelled_passengers }}</div>
+            <div class="small text-muted">Refunded under cancellation policy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue Breakdown by Coach Class -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
+      <div class="card-header bg-white border-bottom border-light py-3 px-4">
+        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-pie-chart-fill text-primary me-2"></i>Revenue by Travel Class</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table align-middle table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4">Class Code</th>
+                <th>Total Bookings</th>
+                <th class="text-end pe-4">Total Test Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in class_revenue %}
+                <tr>
+                  <td class="ps-4">
+                    <span class="badge bg-primary px-3 py-1 font-monospace fs-6">{{ c.class_code }}</span>
+                  </td>
+                  <td>
+                    <span class="fw-semibold text-dark">{{ c.booking_count }}</span>
+                    <span class="text-muted small">bookings</span>
+                  </td>
+                  <td class="text-end pe-4">
+                    <div class="fw-bold text-dark fs-6">&#8377;{{ c.total_rev }}</div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="3" class="p-4 text-center text-muted">No booking data available.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Performing Train Services -->
+  <div class="col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white h-100">
+      <div class="card-header bg-white border-bottom border-light py-3 px-4">
+        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-trophy-fill text-warning me-2"></i>Top Train Services by Volume</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table align-middle table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-4">Train Service</th>
+                <th>Bookings Count</th>
+                <th class="text-end pe-4">Total Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in train_popularity %}
+                <tr>
+                  <td class="ps-4">
+                    <span class="badge bg-secondary me-1">{{ t.train__train_number }}</span>
+                    <strong class="text-dark">{{ t.train__name }}</strong>
+                  </td>
+                  <td>
+                    <span class="fw-semibold text-dark">{{ t.booking_count }}</span>
+                  </td>
+                  <td class="text-end pe-4">
+                    <div class="fw-bold text-dark">&#8377;{{ t.total_rev }}</div>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="3" class="p-4 text-center text-muted">No booking volume recorded yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
