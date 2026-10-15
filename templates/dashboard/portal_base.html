@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="rc-portal-wrapper py-4">
+  <div class="container-fluid px-lg-5">
+    <!-- Portal Header Banner -->
+    <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, var(--rc-navy-dark) 0%, var(--rc-navy-primary) 100%); border-radius: var(--rc-radius-lg); color: #fff;">
+      <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 52px; height: 52px; background: rgba(255, 122, 24, 0.15); border: 1px solid var(--rc-orange);">
+            <i class="{% block portal_icon %}bi bi-person-badge{% endblock %} fs-3" style="color: var(--rc-orange);"></i>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <h4 class="mb-0 fw-bold text-white">{% block portal_title %}Staff Portal{% endblock %}</h4>
+              <span class="badge" style="background-color: var(--rc-orange); color: #fff; font-size: 0.75rem;">
+                {% block portal_badge %}{{ user_role }}{% endblock %}
+              </span>
+            </div>
+            <p class="mb-0 text-white-50 small mt-1">{% block portal_subtitle %}Authorized railway personnel access{% endblock %}</p>
+          </div>
+        </div>
+
+        <!-- Portal Quick Links / Actions -->
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          {% block portal_actions %}{% endblock %}
+        </div>
+      </div>
+
+      <!-- Portal Navigation Tabs (if provided) -->
+      {% block portal_nav_tabs %}{% endblock %}
+    </div>
+
+    <!-- Main Portal Body -->
+    {% block portal_content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

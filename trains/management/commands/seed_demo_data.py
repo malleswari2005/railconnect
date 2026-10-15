@@ -328,6 +328,23 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("All 14-day inventories already exist."))
 
         # -------------------------------------------------------------
+        # 6.5. Seed Demo Staff Assignments
+        # -------------------------------------------------------------
+        from dashboard.models import TTEAssignment
+        first_train = Train.objects.filter(is_active=True).first()
+        if first_train and tte_user:
+            TTEAssignment.objects.get_or_create(
+                tte=tte_user,
+                train=first_train,
+                journey_date=date.today()
+            )
+            TTEAssignment.objects.get_or_create(
+                tte=tte_user,
+                train=first_train,
+                journey_date=date.today() + timedelta(days=1)
+            )
+
+        # -------------------------------------------------------------
         # 7. Print Statistics Summary
         # -------------------------------------------------------------
         station_count = Station.objects.count()
