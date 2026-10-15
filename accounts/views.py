@@ -1,14 +1,23 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib import messages
 from django.utils.http import url_has_allowed_host_and_scheme
+from core.decorators import get_user_role
 from .forms import UserRegistrationForm, UserUpdateForm, ProfileUpdateForm, CustomAuthenticationForm
 
 def register_view(request):
     """Handles new user registration."""
     if request.user.is_authenticated:
+        role = get_user_role(request.user)
+        if role == 'Admin':
+            return redirect('/admin-portal/')
+        elif role == 'TTE':
+            return redirect('/tte/')
+        elif role == 'Operations':
+            return redirect('/operations/')
         return redirect('core:home')
 
     if request.method == 'POST':
@@ -17,6 +26,10 @@ def register_view(request):
             user = form.save(commit=False)
             user.set_password(form.cleaned_data['password'])
             user.save()
+
+            # Ensure new self-registered users are assigned to Passenger group
+            passenger_group, _ = Group.objects.get_or_create(name='Passenger')
+            user.groups.add(passenger_group)
 
             # Profile is auto-created by signal, update extra fields
             profile = user.profile
@@ -35,8 +48,15 @@ def register_view(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
-    """Custom login view with flash messages and next-url redirect."""
+    """Custom login view with flash messages and role-based next-url redirect."""
     if request.user.is_authenticated:
+        role = get_user_role(request.user)
+        if role == 'Admin':
+            return redirect('/admin-portal/')
+        elif role == 'TTE':
+            return redirect('/tte/')
+        elif role == 'Operations':
+            return redirect('/operations/')
         return redirect('core:home')
 
     if request.method == 'POST':
@@ -48,6 +68,15 @@ def login_view(request):
             next_url = request.POST.get('next') or request.GET.get('next')
             if next_url and url_has_allowed_host_and_scheme(url=next_url, allowed_hosts={request.get_host()}):
                 return redirect(next_url)
+
+            # Role-based redirect
+            role = get_user_role(user)
+            if role == 'Admin':
+                return redirect('/admin-portal/')
+            elif role == 'TTE':
+                return redirect('/tte/')
+            elif role == 'Operations':
+                return redirect('/operations/')
             return redirect('core:home')
         else:
             messages.error(request, "Invalid username or password. Please try again.")

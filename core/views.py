@@ -21,6 +21,10 @@ def about_view(request):
     """About page explaining project architecture, features, and team division for viva."""
     return render(request, 'core/about.html')
 
+def handler403_view(request, exception=None):
+    """Custom branded 403 page."""
+    return render(request, '403.html', status=403)
+
 def handler404_view(request, exception=None):
     """Custom branded 404 page."""
     return render(request, '404.html', status=404)

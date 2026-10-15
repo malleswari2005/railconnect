@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}403 - Access Restricted | RailConnect{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-5 text-center">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+      <!-- Restricted Access Shield SVG Icon -->
+      <div class="mb-4">
+        <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="mx-auto">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <line x1="8" y1="11" x2="16" y2="11"></line>
+        </svg>
+      </div>
+
+      <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 mb-3 fw-bold fs-6">
+        HTTP 403 Forbidden
+      </span>
+      <h1 class="h2 fw-bold text-dark mb-3">Access Restricted</h1>
+      <p class="text-muted lead fs-6 mb-4">
+        You do not have the required staff privileges to access this portal or operational resource. Please switch to your authorized account or return to the main portal.
+      </p>
+
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'core:home' %}" class="btn btn-rc-orange px-4 py-2">
+          <i class="bi bi-house-door-fill me-1"></i> Return to Home
+        </a>
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'accounts:logout' %}" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-rc-outline-navy px-4 py-2">
+              <i class="bi bi-box-arrow-right me-1"></i> Switch Account
+            </button>
+          </form>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="btn btn-rc-outline-navy px-4 py-2">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In as Staff
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

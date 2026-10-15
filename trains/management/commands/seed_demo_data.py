@@ -1,5 +1,6 @@
+import os
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db import transaction
 from datetime import time, date, timedelta
 from trains.models import Station, Train, TrainStop, TrainClass
@@ -14,8 +15,18 @@ class Command(BaseCommand):
         self.stdout.write(self.style.NOTICE("Starting RailConnect Andhra Pradesh network seeding..."))
 
         # -------------------------------------------------------------
-        # 1. Seed Accounts (staff_admin, passenger1, passenger2)
+        # 1. Setup Roles & Seed Accounts (Admin, TTE, Operations, Passenger)
         # -------------------------------------------------------------
+        groups = {}
+        for role_name in ['Passenger', 'TTE', 'Operations', 'Admin']:
+            grp, _ = Group.objects.get_or_create(name=role_name)
+            groups[role_name] = grp
+
+        admin_pwd = os.environ.get('ADMIN_DEMO_PASSWORD', 'AdminPass@123')
+        tte_pwd = os.environ.get('TTE_DEMO_PASSWORD', 'TtePass@123')
+        ops_pwd = os.environ.get('OPS_DEMO_PASSWORD', 'OpsPass@123')
+
+        # Admin: staff_admin (Only Admin & superusers get is_staff)
         admin_user, created = User.objects.get_or_create(
             username='staff_admin',
             defaults={
@@ -26,46 +37,105 @@ class Command(BaseCommand):
                 'is_superuser': True,
             }
         )
-        admin_user.set_password('AdminPass@123')
+        admin_user.set_password(admin_pwd)
         admin_user.is_staff = True
         admin_user.is_superuser = True
         admin_user.save()
+        admin_user.groups.add(groups['Admin'])
         if hasattr(admin_user, 'profile'):
             admin_user.profile.phone_number = '9810011223'
             admin_user.profile.city = 'Vijayawada'
             admin_user.profile.save()
 
+        # TTE Officer: tte_officer (Not is_staff)
+        tte_user, created = User.objects.get_or_create(
+            username='tte_officer',
+            defaults={
+                'email': 'tte@railconnect.local',
+                'first_name': 'Suresh',
+                'last_name': 'Kumar',
+                'is_staff': False,
+                'is_superuser': False,
+            }
+        )
+        tte_user.set_password(tte_pwd)
+        tte_user.is_staff = False
+        tte_user.is_superuser = False
+        tte_user.save()
+        tte_user.groups.add(groups['TTE'])
+        if hasattr(tte_user, 'profile'):
+            tte_user.profile.phone_number = '9811223344'
+            tte_user.profile.city = 'Vijayawada'
+            tte_user.profile.save()
+
+        # Operations Controller: ops_controller (Not is_staff)
+        ops_user, created = User.objects.get_or_create(
+            username='ops_controller',
+            defaults={
+                'email': 'ops@railconnect.local',
+                'first_name': 'Ramesh',
+                'last_name': 'Chandra',
+                'is_staff': False,
+                'is_superuser': False,
+            }
+        )
+        ops_user.set_password(ops_pwd)
+        ops_user.is_staff = False
+        ops_user.is_superuser = False
+        ops_user.save()
+        ops_user.groups.add(groups['Operations'])
+        if hasattr(ops_user, 'profile'):
+            ops_user.profile.phone_number = '9822334455'
+            ops_user.profile.city = 'Guntur'
+            ops_user.profile.save()
+
+        # Passenger 1
         p1, created = User.objects.get_or_create(
             username='passenger1',
             defaults={
                 'email': 'passenger1@example.com',
                 'first_name': 'Aarav',
                 'last_name': 'Sharma',
+                'is_staff': False,
             }
         )
         p1.set_password('Pass@123')
+        p1.is_staff = False
         p1.save()
+        p1.groups.add(groups['Passenger'])
         if hasattr(p1, 'profile'):
             p1.profile.phone_number = '9876543210'
             p1.profile.city = 'Visakhapatnam'
             p1.profile.save()
 
+        # Passenger 2
         p2, created = User.objects.get_or_create(
             username='passenger2',
             defaults={
                 'email': 'passenger2@example.com',
                 'first_name': 'Priya',
                 'last_name': 'Nair',
+                'is_staff': False,
             }
         )
         p2.set_password('Pass@123')
+        p2.is_staff = False
         p2.save()
+        p2.groups.add(groups['Passenger'])
         if hasattr(p2, 'profile'):
             p2.profile.phone_number = '9876501234'
             p2.profile.city = 'Tirupati'
             p2.profile.save()
 
-        self.stdout.write(self.style.SUCCESS("Verified accounts: staff_admin, passenger1, passenger2"))
+        # Ensure all existing and newly found users belong to at least one group
+        for u in User.objects.all():
+            if not u.groups.exists():
+                if u.is_superuser or u.is_staff or u.username == 'staff_admin':
+                    u.groups.add(groups['Admin'])
+                else:
+                    u.groups.add(groups['Passenger'])
+
+        self.stdout.write(self.style.SUCCESS("Verified accounts & roles: staff_admin, tte_officer, ops_controller, passenger1, passenger2"))
 
         # -------------------------------------------------------------
         # 2. Seed Stations (Idempotent update_or_create)
