@@ -18,6 +18,8 @@ media/qrcodes/*.png
 
 # Staticfiles collected
 staticfiles/
+staticfiles
+
 
 # Environment variables
 .env

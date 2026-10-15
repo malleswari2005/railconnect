@@ -180,26 +180,29 @@ Destroying test database for alias 'default'...
 
 ---
 
-## 🚀 Production Deployment (Render / Railway / Heroku)
+## 🚀 Production Deployment (Render)
 
-1. Set environment variables in your hosting dashboard:
+1. Set environment variables in your Render Web Service dashboard:
    ```env
    SECRET_KEY=<strong-random-secret-key>
    DEBUG=False
-   ALLOWED_HOSTS=<your-domain>.render.com,localhost
-   DATABASE_URL=postgres://user:password@host:port/dbname
+   ALLOWED_HOSTS=.onrender.com,localhost,127.0.0.1
+   CSRF_TRUSTED_ORIGINS=https://*.onrender.com
+   DATABASE_URL=postgresql://<user>:<password>@<render-pg-host>:5432/<dbname>
    ADMIN_DEMO_PASSWORD=<strong-admin-password>
    TTE_DEMO_PASSWORD=<strong-tte-password>
    OPS_DEMO_PASSWORD=<strong-ops-password>
    ```
-2. Build command:
+2. **Build Command**:
    ```bash
-   pip install -r requirements.txt && python manage.py migrate && python manage.py seed_demo_data && python manage.py collectstatic --noinput
+   ./build.sh
    ```
-3. Start command (configured in `Procfile`):
+   *(Alternatively: `chmod +x build.sh && ./build.sh`)*
+3. **Start Command**:
    ```bash
-   web: gunicorn railconnect.wsgi --log-file -
+   gunicorn railconnect.wsgi:application
    ```
+   *(Also configured in `Procfile` as `web: gunicorn railconnect.wsgi --log-file -`)*
 
 ---
 
