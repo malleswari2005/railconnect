@@ -195,6 +195,63 @@ class Command(BaseCommand):
                 ]
             },
             {
+                'number': '12951',
+                'name': 'Mumbai Tejas Rajdhani',
+                'type': 'RAJDHANI',
+                'src': 'MMCT', 'dest': 'NDLS',
+                'dep': time(17, 0), 'arr': time(8, 32),
+                'dist': 1384,
+                'days': 'MON,TUE,WED,THU,FRI,SAT,SUN',
+                'stops': [
+                    ('MMCT', 1, None, time(17, 0), 0, 0, 0),
+                    ('ADI', 2, time(21, 55), time(22, 5), 10, 492, 0),
+                    ('BPL', 3, time(3, 15), time(3, 25), 10, 920, 1),
+                    ('NDLS', 4, time(8, 32), None, 0, 1384, 1),
+                ],
+                'classes': [
+                    ('1A', 'AC First Class', 2100, 2.40, 1, 24),
+                    ('2A', 'AC 2-Tier', 1350, 1.75, 2, 48),
+                    ('3A', 'AC 3-Tier', 900, 1.20, 4, 64),
+                ]
+            },
+            {
+                'number': '12952',
+                'name': 'New Delhi Mumbai Rajdhani',
+                'type': 'RAJDHANI',
+                'src': 'NDLS', 'dest': 'MMCT',
+                'dep': time(16, 55), 'arr': time(8, 35),
+                'dist': 1384,
+                'days': 'MON,TUE,WED,THU,FRI,SAT,SUN',
+                'stops': [
+                    ('NDLS', 1, None, time(16, 55), 0, 0, 0),
+                    ('BPL', 2, time(22, 10), time(22, 20), 10, 464, 0),
+                    ('ADI', 3, time(3, 20), time(3, 30), 10, 892, 1),
+                    ('MMCT', 4, time(8, 35), None, 0, 1384, 1),
+                ],
+                'classes': [
+                    ('1A', 'AC First Class', 2100, 2.40, 1, 24),
+                    ('2A', 'AC 2-Tier', 1350, 1.75, 2, 48),
+                    ('3A', 'AC 3-Tier', 900, 1.20, 4, 64),
+                ]
+            },
+            {
+                'number': '12009',
+                'name': 'Mumbai Ahmedabad Shatabdi',
+                'type': 'SHATABDI',
+                'src': 'MMCT', 'dest': 'ADI',
+                'dep': time(6, 20), 'arr': time(12, 45),
+                'dist': 492,
+                'days': 'MON,TUE,WED,THU,FRI,SAT',
+                'stops': [
+                    ('MMCT', 1, None, time(6, 20), 0, 0, 0),
+                    ('ADI', 2, time(12, 45), None, 0, 492, 0),
+                ],
+                'classes': [
+                    ('CC', 'AC Chair Car', 500, 1.15, 6, 78),
+                    ('1A', 'Executive Chair Car', 1100, 1.90, 2, 46),
+                ]
+            },
+            {
                 'number': '12004',
                 'name': 'Lucknow Shatabdi',
                 'type': 'SHATABDI',
@@ -209,6 +266,115 @@ class Command(BaseCommand):
                 'classes': [
                     ('CC', 'AC Chair Car', 300, 1.00, 4, 78),
                     ('1A', 'Executive Chair Car', 700, 1.80, 1, 46),
+                ]
+            },
+            {
+                'number': '12658',
+                'name': 'Chennai Mail',
+                'type': 'SUPERFAST',
+                'src': 'SBC', 'dest': 'MAS',
+                'dep': time(22, 40), 'arr': time(4, 15),
+                'dist': 362,
+                'days': 'MON,TUE,WED,THU,FRI,SAT,SUN',
+                'stops': [
+                    ('SBC', 1, None, time(22, 40), 0, 0, 0),
+                    ('MAS', 2, time(4, 15), None, 0, 362, 1),
+                ],
+                'classes': [
+                    ('1A', 'AC First Class', 850, 1.70, 1, 24),
+                    ('2A', 'AC 2-Tier', 550, 1.30, 2, 48),
+                    ('3A', 'AC 3-Tier', 380, 0.90, 4, 64),
+                    ('SL', 'Sleeper Class', 180, 0.40, 6, 72),
+                ]
+            },
+            {
+                'number': '12626',
+                'name': 'Kerala Express',
+                'type': 'SUPERFAST',
+                'src': 'NDLS', 'dest': 'SBC',
+                'dep': time(20, 10), 'arr': time(14, 30),
+                'dist': 2390,
+                'days': 'MON,TUE,WED,THU,FRI,SAT,SUN',
+                'stops': [
+                    ('NDLS', 1, None, time(20, 10), 0, 0, 0),
+                    ('BPL', 2, time(5, 20), time(5, 30), 10, 700, 1),
+                    ('HYB', 3, time(18, 10), time(18, 20), 10, 1540, 1),
+                    ('SBC', 4, time(14, 30), None, 0, 2390, 2),
+                ],
+                'classes': [
+                    ('2A', 'AC 2-Tier', 1200, 1.60, 2, 48),
+                    ('3A', 'AC 3-Tier', 800, 1.10, 5, 64),
+                    ('SL', 'Sleeper Class', 350, 0.45, 8, 72),
+                ]
+            },
+            {
+                'number': '12157',
+                'name': 'Hutatma Express',
+                'type': 'SUPERFAST',
+                'src': 'PUNE', 'dest': 'MMCT',
+                'dep': time(18, 0), 'arr': time(21, 55),
+                'dist': 192,
+                'days': 'MON,TUE,WED,THU,FRI,SAT,SUN',
+                'stops': [
+                    ('PUNE', 1, None, time(18, 0), 0, 0, 0),
+                    ('MMCT', 2, time(21, 55), None, 0, 192, 0),
+                ],
+                'classes': [
+                    ('CC', 'AC Chair Car', 260, 0.90, 3, 78),
+                    ('2S', 'Second Sitting', 110, 0.35, 8, 108),
+                ]
+            },
+            {
+                'number': '12011',
+                'name': 'Kalka Shatabdi Express',
+                'type': 'SHATABDI',
+                'src': 'NDLS', 'dest': 'CDG',
+                'dep': time(7, 40), 'arr': time(11, 5),
+                'dist': 266,
+                'days': 'MON,TUE,WED,THU,FRI,SAT,SUN',
+                'stops': [
+                    ('NDLS', 1, None, time(7, 40), 0, 0, 0),
+                    ('CDG', 2, time(11, 5), None, 0, 266, 0),
+                ],
+                'classes': [
+                    ('CC', 'AC Chair Car', 320, 1.10, 6, 78),
+                    ('1A', 'Executive Chair Car', 750, 1.80, 2, 46),
+                ]
+            },
+            {
+                'number': '22436',
+                'name': 'Vande Bharat Express',
+                'type': 'VANDE_BHARAT',
+                'src': 'NDLS', 'dest': 'BSB',
+                'dep': time(6, 0), 'arr': time(14, 0),
+                'dist': 759,
+                'days': 'MON,TUE,WED,FRI,SAT,SUN',
+                'stops': [
+                    ('NDLS', 1, None, time(6, 0), 0, 0, 0),
+                    ('CNB', 2, time(10, 8), time(10, 10), 2, 436, 0),
+                    ('BSB', 3, time(14, 0), None, 0, 759, 0),
+                ],
+                'classes': [
+                    ('CC', 'AC Chair Car', 650, 1.50, 6, 78),
+                    ('1A', 'Executive Chair Car', 1350, 2.30, 2, 52),
+                ]
+            },
+            {
+                'number': '22435',
+                'name': 'Varanasi Vande Bharat',
+                'type': 'VANDE_BHARAT',
+                'src': 'BSB', 'dest': 'NDLS',
+                'dep': time(15, 0), 'arr': time(23, 0),
+                'dist': 759,
+                'days': 'MON,TUE,WED,FRI,SAT,SUN',
+                'stops': [
+                    ('BSB', 1, None, time(15, 0), 0, 0, 0),
+                    ('CNB', 2, time(18, 30), time(18, 32), 2, 323, 0),
+                    ('NDLS', 3, time(23, 0), None, 0, 759, 0),
+                ],
+                'classes': [
+                    ('CC', 'AC Chair Car', 650, 1.50, 6, 78),
+                    ('1A', 'Executive Chair Car', 1350, 2.30, 2, 52),
                 ]
             },
         ]
